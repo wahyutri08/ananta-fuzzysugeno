@@ -114,6 +114,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                 <th>Email</th>
                                                 <th>Nama</th>
                                                 <th>Role</th>
+                                                <th>Status</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -132,6 +133,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                             echo '<span class="badge bg-success">' . $userData["role"] . '</span>';
                                                         } else {
                                                             echo '<span class="badge bg-primary">' . $userData["role"] . '</span>';
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php
+                                                        if ($userData['status'] == 'Aktif') {
+                                                            echo '<span class="badge bg-success">' . $userData["status"] . '</span>';
+                                                        } else {
+                                                            echo '<span class="badge bg-danger">' . $userData["status"] . '</span>';
                                                         }
                                                         ?>
                                                     </td>

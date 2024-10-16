@@ -26,10 +26,6 @@ $variabel = query("SELECT * FROM variabel");
 //     $d_siswa = searchSiswa($_POST["keyword"]);
 // }
 
-// if ($halamanAktif > $jumlahHalaman) {
-//     header("Location: ../data_siswa");
-//     exit();
-// }
 ?>
 <!DOCTYPE html>
 <!--
@@ -72,12 +68,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Data Variabel</h1>
+                            <h1 class="m-0">Rule Fuzzy</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Data Variabel</li>
+                                <li class="breadcrumb-item active">Rule Fuzzy</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->

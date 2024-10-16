@@ -5,10 +5,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     header("Location: ../login");
     exit;
 }
-if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
-    exit;
-}
 
 $id_siswa = $_GET["id_siswa"];
 

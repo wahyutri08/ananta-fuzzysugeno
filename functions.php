@@ -32,6 +32,7 @@ function register($data)
     $password = mysqli_real_escape_string($db, $data["password"]);
     $password2 = mysqli_real_escape_string($db, $data["password2"]);
     $role = htmlspecialchars($data["role"]);
+    $status = htmlspecialchars($data["status"]);
 
     //  Upload Gambar
     $avatar = upload();
@@ -53,7 +54,7 @@ function register($data)
 
     $password = password_hash($password, PASSWORD_DEFAULT);
 
-    mysqli_query($db, "INSERT INTO users VALUES('', '$username','$email', '$nama', '$password', '$role', '$avatar')");
+    mysqli_query($db, "INSERT INTO users VALUES('', '$username','$email', '$nama', '$password', '$role', '$status', '$avatar')");
     return mysqli_affected_rows($db);
 }
 
@@ -67,6 +68,7 @@ function editUsers($data)
     $password = mysqli_real_escape_string($db, $data["password"]);
     $avatarLama = htmlspecialchars($data["avatarLama"]);
     $role = htmlspecialchars($data["role"]);
+    $status = htmlspecialchars($data["status"]);
     // $usernameLama = htmlspecialchars($data["username"]);
 
     // Cek apakah user pilih avatar baru atau tidak
@@ -90,6 +92,7 @@ function editUsers($data)
         email = '$email',
         password = '$password',
         role = '$role',
+        status = '$status',
         avatar = '$avatar' WHERE id = $id";
     mysqli_query($db, $query);
 
@@ -191,6 +194,9 @@ function addSiswa($data)
 {
     global $db;
 
+    $role = $_SESSION['role'];
+    $user_id = $_SESSION['id'];
+
     $nis = htmlspecialchars($data["nis"]);
     $nama_siswa = htmlspecialchars($data["nama_siswa"]);
     $alamat = htmlspecialchars($data["alamat"]);
@@ -200,7 +206,6 @@ function addSiswa($data)
     $no_telfon = htmlspecialchars($data["no_telfon"]);
     $email = htmlspecialchars($data["email"]);
 
-
     // Periksa apakah NIS sudah ada di database
     $query = "SELECT * FROM siswa WHERE nis = '$nis'";
     $result = mysqli_query($db, $query);
@@ -209,12 +214,16 @@ function addSiswa($data)
         return -1;
     }
 
-    // Menambahkan data siswa baru
-    $query = "INSERT INTO siswa 
-              VALUES ('', '$nis', '$nama_siswa', '$alamat', '$tanggal_lahir', '$kelas', '$jenis_kelamin', '$no_telfon', '$email')";
-    mysqli_query($db, $query);
+    // Cek role pengguna
+    if ($role == 'Staff') {
+        $query = "INSERT INTO siswa 
+                  VALUES ('','$user_id', '$nis', '$nama_siswa', '$alamat', '$tanggal_lahir', '$kelas', '$jenis_kelamin', '$no_telfon', '$email')";
+    } elseif ($role == 'Admin') {
+        $query = "INSERT INTO siswa 
+                  VALUES ('', NULL, '$nis', '$nama_siswa', '$alamat', '$tanggal_lahir', '$kelas', '$jenis_kelamin', '$no_telfon', '$email')";
+    }
 
-    // Mengembalikan jumlah baris yang terpengaruh
+    mysqli_query($db, $query);
     return mysqli_affected_rows($db);
 }
 
@@ -351,17 +360,22 @@ function is_user_active($id)
 {
     global $db;
 
-    $result = mysqli_query($db, "SELECT COUNT(*) AS count FROM users WHERE id = '$id'");
+    // Cek status pengguna berdasarkan ID
+    $result = mysqli_query($db, "SELECT status FROM users WHERE id = '$id'");
     $row = mysqli_fetch_assoc($result);
+
+    // Jika data ditemukan
     if ($row) {
-        $count = $row["count"];
-        if ($count > 0) {
+        // Cek apakah statusnya 'Aktif'
+        if ($row['status'] === 'Aktif') {
             return true;
         }
-    } else {
-        return false;
     }
+
+    // Jika tidak aktif atau tidak ditemukan
+    return false;
 }
+
 
 function logout()
 {

@@ -6,6 +6,12 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+if ($_SESSION['role'] !== 'Admin') {
+    header("Location: ../dashboard");
+    exit;
+}
+
+
 $variabel = query("SELECT * FROM variabel");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

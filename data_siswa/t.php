@@ -25,3 +25,28 @@
                     <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" placeholder="Tanggal Lahir" required>
                 </div>
             </div>
+
+
+
+
+            <?php
+            session_start();
+            include_once("../auth_check.php");
+            if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
+                header("Location: ../login");
+                exit;
+            }
+
+            $jumlahDataPerHalaman = 10;
+            $jumlahData = count(query("SELECT * FROM siswa"));
+            $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+            $halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
+            $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+
+            $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+
+            if (isset($_POST["search"])) {
+                $d_siswa = searchSiswa($_POST["keyword"]);
+            }
+
+            ?>

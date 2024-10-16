@@ -6,28 +6,41 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
-    exit;
-}
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
 
 $jumlahDataPerHalaman = 10;
-$jumlahData = count(query("SELECT * FROM siswa"));
+
+if ($role == 'Admin') {
+    $jumlahData = count(query("SELECT * FROM siswa"));
+} elseif ($role == 'Staff') {
+    $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
+}
+
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 $halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
-
-if (isset($_POST["search"])) {
-    $d_siswa = searchSiswa($_POST["keyword"]);
+// Query berdasarkan role pengguna
+if ($role == 'Admin') {
+    $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+} elseif ($role == 'Staff') {
+    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
 }
 
-if ($halamanAktif > $jumlahHalaman) {
-    header("Location: ../data_siswa");
-    exit();
+// Jika ada pencarian
+if (isset($_POST["search"])) {
+    $keyword = $_POST["keyword"];
+    if ($role == 'Admin') {
+        $d_siswa = searchSiswa($keyword);  // Admin bisa mencari semua data
+    } elseif ($role == 'Staff') {
+        // Staff hanya bisa mencari data yang terkait dengan dirinya
+        $d_siswa = searchSiswa($keyword, $user_id);
+    }
 }
 ?>
+
+
 <!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
@@ -89,7 +102,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
-                                    <h3 class="card-title"><a href="add_siswa.php" class="btn btn-sm btn-block bg-gradient-primary"><i class="fas fa-plus"></i> Tambah Data</a></h3>
+                                    <?php
+                                    if ($role == 'Staff') {
+                                        echo '<h3 class="card-title"><a href="add_siswa.php" class="btn btn-sm btn-block bg-gradient-primary"><i class="fas fa-plus"></i> Tambah Data</a></h3>';
+                                    } else {
+                                        echo '';
+                                    }
+                                    ?>
                                     <div class="card-tools mt-2">
                                         <form action="" method="POST">
                                             <div class="input-group input-group-sm" style="width: 150px;">

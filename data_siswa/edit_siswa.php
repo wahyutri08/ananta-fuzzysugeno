@@ -6,11 +6,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
-    exit;
-}
-
 if (isset($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {

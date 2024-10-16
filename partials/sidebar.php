@@ -48,15 +48,15 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="../data_siswa" class="nav-link <?= ($current_page == 'data_siswa' ? 'active' : '') ?>">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Data Siswa</p>
+                            </a>
+                        </li>
                         <?php
                         if ($user['role'] == 'Admin') {
                             echo '
-                            <li class="nav-item">
-                                <a href="../data_siswa" class="nav-link ' . ($current_page == 'data_siswa' ? 'active' : '') . '">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Data Siswa</p>
-                                </a>
-                            </li>
                             <li class="nav-item">
                                 <a href="../data_variabel" class="nav-link ' . ($current_page == 'data_variabel' ? 'active' : '') . '">
                                     <i class="far fa-circle nav-icon"></i>

@@ -6,11 +6,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
-    exit;
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = addSiswa($_POST);
     if ($result > 0) {

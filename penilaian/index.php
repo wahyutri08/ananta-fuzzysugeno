@@ -19,10 +19,6 @@ if (isset($_POST["search"])) {
     $d_siswa = searchSiswa($_POST["keyword"]);
 }
 
-if ($halamanAktif > $jumlahHalaman) {
-    header("Location: ../data_siswa");
-    exit();
-}
 ?>
 <!DOCTYPE html>
 <!--

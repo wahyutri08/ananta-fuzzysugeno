@@ -148,6 +148,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </select>
                                         </div>
                                         <div class="form-group">
+                                            <label>Status <span class="text-danger">*</span></label>
+                                            <select class="custom-select form-control" id="status" name="status">
+                                                <option value="Aktif" <?= ($users["status"] == "Aktif") ? "selected" : "" ?>>Aktif</option>
+                                                <option value="Tidak Aktif" <?= ($users["status"] == "Tidak Aktif") ? "selected" : "" ?>>Tidak Aktif</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="avatar">Photo Profile</label>
                                             <div class="input-group">
                                                 <div class="custom-file">

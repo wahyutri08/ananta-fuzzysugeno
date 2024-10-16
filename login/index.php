@@ -18,24 +18,33 @@ if (isset($_POST["login"])) {
     $usernameOremail = $_POST["username"];
     $password = $_POST["password"];
 
+    // Query untuk mencari pengguna berdasarkan username atau email
     $result = mysqli_query($db, "SELECT * FROM users WHERE username = '$usernameOremail' OR email = '$usernameOremail'");
 
     if (mysqli_num_rows($result) === 1) {
         $row = mysqli_fetch_assoc($result);
-        if (password_verify($password, $row["password"])) {
-            $_SESSION["login"] = true;
-            $_SESSION['nama'] = $row['nama'];
-            $_SESSION['username'] = $row['username'];
-            $_SESSION['id'] = $row['id'];
-            $_SESSION['avatar'] = $row['avatar'];
-            $_SESSION['role'] = $row['role'];
-            header("Location: ../dashboard");
-            exit;
+
+        // Cek status pengguna
+        if ($row['status'] === 'Aktif') {
+            // Verifikasi password
+            if (password_verify($password, $row["password"])) {
+                // Jika login berhasil, set session
+                $_SESSION["login"] = true;
+                $_SESSION['nama'] = $row['nama'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['id'] = $row['id'];
+                $_SESSION['avatar'] = $row['avatar'];
+                $_SESSION['role'] = $row['role'];
+                header("Location: ../dashboard");
+                exit;
+            } else {
+                $error = 'Password Salah.';
+            }
         } else {
-            $error = 'Password Salah.';
+            $error = 'Akun Anda Tidak Aktif. Silakan Hubungi Admin.';
         }
     } else {
-        $error = 'Username Atau Email Tidak Ditemukan.';
+        $error = 'Username atau Email tidak ditemukan.';
     }
 }
 ?>
