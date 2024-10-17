@@ -50,3 +50,37 @@
             }
 
             ?>
+
+
+
+            <form method="POST" action="" enctype="multipart/form-data" id="myForm">
+                <input type="hidden" name="id_siswa" value="<?= $siswa["id_siswa"]; ?>">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <?php foreach ($variabel as $v) : ?>
+                                <div class="form-group row">
+                                    <label for="<?= $v["id_variabel"]; ?>" class="col-sm-5 control-label"><?= $v["nama_variabel"]; ?> <span class="text-danger">*</span></label>
+                                    <div class="col-sm-6">
+                                        <?php $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']); ?>
+                                        <div class="input-group">
+                                            <?php if ($penilaian) {
+                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="' . $penilaian[0]['nilai'] . '">';
+                                            } else {
+                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="">';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button type="submit" name="submit" class="btn btn-success">Submit Change</button>
+                </div>
+            </form>

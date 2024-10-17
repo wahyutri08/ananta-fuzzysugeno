@@ -6,17 +6,38 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
+
+$variabel = query("SELECT * FROM variabel");
 $jumlahDataPerHalaman = 10;
-$jumlahData = count(query("SELECT * FROM siswa"));
+
+if ($role == 'Admin') {
+    $jumlahData = count(query("SELECT * FROM siswa"));
+} elseif ($role == 'Staff') {
+    $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
+}
+
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 $halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
-$variabel = query("SELECT * FROM variabel");
+// Query berdasarkan role pengguna
+if ($role == 'Admin') {
+    $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+} elseif ($role == 'Staff') {
+    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
+}
 
+// Jika ada pencarian
 if (isset($_POST["search"])) {
-    $d_siswa = searchSiswa($_POST["keyword"]);
+    $keyword = $_POST["keyword"];
+    if ($role == 'Admin') {
+        $d_siswa = searchSiswa($keyword);  // Admin bisa mencari semua data
+    } elseif ($role == 'Staff') {
+        // Staff hanya bisa mencari data yang terkait dengan dirinya
+        $d_siswa = searchSiswa($keyword, $user_id);
+    }
 }
 
 ?>

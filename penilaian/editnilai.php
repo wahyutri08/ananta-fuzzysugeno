@@ -6,6 +6,9 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
+
 if (isset($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {
@@ -18,7 +21,12 @@ if ($id_siswa === null) {
     exit;
 }
 
-$siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
+if ($role == 'Admin') {
+    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
+} else {
+    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa AND user_id = $user_id");
+}
+
 $variabel = query("SELECT * FROM variabel");
 
 if (empty($siswa)) {
@@ -35,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Memanggil fungsi jika ada data yang diinput
-    dataPostNilai($_POST, $_GET);
+    dataPostNilai($_POST, $_GET, $role, $user_id);
     echo json_encode(["status" => "success", "message" => "Data Berhasil Diubah"]);
     exit;
 }
@@ -115,24 +123,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                     <div class="form-group row">
                                                         <label for="<?= $v["id_variabel"]; ?>" class="col-sm-5 control-label"><?= $v["nama_variabel"]; ?> <span class="text-danger">*</span></label>
                                                         <div class="col-sm-6">
-                                                            <?php $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']); ?>
-                                                            <div class="input-group">
-                                                                <?php if ($penilaian) {
-                                                                    echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="' . $penilaian[0]['nilai'] . '">';
-                                                                } else {
-                                                                    echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="">';
-                                                                }
-                                                                ?>
-                                                            </div>
+                                                            <?php
+                                                            // Cek role, ambil nilai hanya jika user adalah admin atau terkait sebagai staff
+                                                            if ($role == 'Admin') {
+                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']);
+                                                            } elseif ($role == 'Staff') {
+                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel'] . " AND user_id = " . $user_id);
+                                                            }
+
+                                                            if ($penilaian) {
+                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="' . $penilaian[0]['nilai'] . '">';
+                                                            } else {
+                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="">';
+                                                            }
+                                                            ?>
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>
                                         </div>
-
                                     </div>
-                                    <!-- /.card-body -->
-
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-success">Submit Change</button>
                                     </div>

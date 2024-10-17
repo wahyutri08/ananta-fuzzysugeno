@@ -132,7 +132,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                         if ($userData['role'] == 'Admin') {
                                                             echo '<span class="badge bg-success">' . $userData["role"] . '</span>';
                                                         } else {
-                                                            echo '<span class="badge bg-primary">' . $userData["role"] . '</span>';
+                                                            echo '<span class="badge bg-warning">' . $userData["role"] . '</span>';
                                                         }
                                                         ?>
                                                     </td>

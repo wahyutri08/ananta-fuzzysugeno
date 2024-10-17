@@ -271,6 +271,61 @@ function deleteSiswa($id_siswa)
     return mysqli_affected_rows($db);
 }
 
+// function dataPostNilai($postData, $getData)
+// {
+//     $role = $_SESSION['role'];
+//     $user_id = $_SESSION['id'];
+
+//     foreach ($postData as $key => $value) {
+//         if ($key == 'id_siswa' || $key == 'submit') {
+//             continue;
+//         }
+
+//         // Tambahkan nama variabel ke dalam array
+//         $querySelect = query("SELECT * FROM penilaian WHERE id_variabel = " . $key . " AND id_siswa = " . $getData['id_siswa']);
+
+//         if (count($querySelect) > 0) {
+//             editNilai($postData, $getData, $key);
+//         } else {
+//             tambahNilai($postData, $getData, $key);
+//         }
+//     }
+// }
+
+// function dataPostNilai($postData, $getData, $role, $user_id)
+// {
+
+//     foreach ($postData as $key => $value) {
+//         if (
+//             $key == 'id_siswa' || $key == 'submit'
+//         ) {
+//             continue;
+//         }
+
+//         // Cek role pengguna
+//         if ($role == 'Admin') {
+//             // Admin bisa mengedit semua siswa
+//             $querySelect = query("SELECT * FROM penilaian WHERE id_variabel = " . $key . " AND id_siswa = " . $getData['id_siswa']);
+//         } elseif ($role == 'Staff') {
+//             // Staff hanya bisa mengedit siswa yang terkait dengan user_id mereka
+//             $querySelect = query("SELECT * FROM penilaian WHERE id_variabel = " . $key . " AND id_siswa = " . $getData['id_siswa'] . " AND user_id = " . $user_id);
+//         }
+
+//         if (count($querySelect) > 0) {
+//             // Jika nilai sudah ada, lakukan update
+//             editNilai(
+//                 $postData,
+//                 $getData,
+//                 $key,
+//                 $user_id
+//             );
+//         } else {
+//             // Jika nilai belum ada, tambahkan
+//             tambahNilai($postData, $user_id, $getData, $key);
+//         }
+//     }
+// }
+
 function dataPostNilai($postData, $getData, $role, $user_id)
 {
     foreach ($postData as $key => $value) {
@@ -292,6 +347,85 @@ function dataPostNilai($postData, $getData, $role, $user_id)
         }
     }
 }
+
+// function editNilai($post, $get, $key)
+// {
+//     global $db;
+//     $query = "UPDATE penilaian SET 
+//     nilai = " . $post[$key] . " WHERE id_variabel = " . $key . " AND id_siswa = " . $get['id_siswa'];
+//     mysqli_query($db, $query);
+
+//     return mysqli_affected_rows($db);
+// }
+
+// function editNilai($post, $get, $key, $user_id)
+// {
+//     global $db;
+
+//     // Cek role untuk menentukan query
+//     if ($_SESSION['role'] == 'Admin') {
+//         // Admin bisa mengedit semua data
+//         $query = "UPDATE penilaian SET 
+//                   nilai = '" . $post[$key] . "' 
+//                   WHERE id_variabel = '" . $key . "' 
+//                   AND id_siswa = '" . $get['id_siswa'] . "'";
+//     } elseif ($_SESSION['role'] == 'Staff') {
+//         // Staff hanya bisa mengedit data siswa yang terkait dengan mereka (user_id)
+//         $query = "UPDATE penilaian SET 
+//                   nilai = '" . $post[$key] . "' 
+//                   WHERE id_variabel = '" . $key . "' 
+//                   AND id_siswa = '" . $get['id_siswa'] . "' 
+//                   AND user_id = '" . $user_id . "'";
+//     }
+
+//     mysqli_query($db, $query);
+//     return mysqli_affected_rows($db);
+// }
+
+
+
+// function tambahNilai($post, $get, $key)
+// {
+//     global $db;
+
+//     $query = "INSERT INTO penilaian VALUES 
+//     (
+//       '', 
+//        " . $get['id_siswa'] . ",
+//        " . $key . ",
+//        $post[$key]
+//     )";
+
+//     mysqli_query($db, $query);
+//     return mysqli_affected_rows($db);
+// }
+
+// function tambahNilai($post, $user_id, $get, $key)
+// {
+//     global $db;
+
+//     // Admin bisa menambah nilai untuk siapa saja
+//     if (
+//         $_SESSION['role'] == 'Admin'
+//     ) {
+//         $query = "INSERT INTO penilaian (id_penilaian, user_id, id_siswa, id_variabel, nilai) 
+//                   VALUES ('', NULL, 
+//                   " . $get['id_siswa'] . ", 
+//                   " . $key . ", 
+//                       $post[$key])";  // Admin tidak perlu user_id
+//     } elseif ($_SESSION['role'] == 'Staff') {
+//         // Staff hanya bisa menambah nilai untuk siswa yang mereka tangani
+//         $query = "INSERT INTO penilaian (id_penilaian, user_id, id_siswa, id_variabel, nilai) 
+//                   VALUES ('', 
+//                   " . $user_id . "
+//                   " . $get['id_siswa'] . ", 
+//                   " . $key . ", 
+//                       $post[$key])";  // Staff memerlukan user_id untuk menghubungkan siswa
+//     }
+
+//     mysqli_query($db, $query);
+//     return mysqli_affected_rows($db);
+// }
 
 function editNilai($post, $get, $key, $role, $user_id)
 {

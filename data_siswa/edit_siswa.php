@@ -6,6 +6,9 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
+
 if (isset($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {
@@ -18,7 +21,12 @@ if ($id_siswa === null) {
     exit;
 }
 
-$siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
+if ($role == 'Admin') {
+    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
+} else {
+    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa AND user_id = $user_id");
+}
+
 
 if (empty($siswa)) {
     header("Location: ../error.php?message=ID Siswa tidak valid");

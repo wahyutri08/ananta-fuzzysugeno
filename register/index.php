@@ -109,7 +109,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         </div>
                                         <div class="form-group">
                                             <label for="password2">Konfirmasi Password <span class="text-danger">*</span></label>
-                                            <input type="password2" class="form-control" name="password2" id="password2" placeholder="Konfirmasi Password" required>
+                                            <input type="password" class="form-control" name="password2" id="password2" placeholder="Konfirmasi Password" required>
                                         </div>
                                         <div class="form-group">
                                             <label>Role <span class="text-danger">*</span></label>
