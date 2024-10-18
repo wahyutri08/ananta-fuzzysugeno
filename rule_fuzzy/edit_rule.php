@@ -6,45 +6,41 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-$user_id = $_SESSION['id'];
-$role = $_SESSION['role'];
+if ($_SESSION['role'] !== 'Admin') {
+    header("Location: ../dashboard");
+    exit;
+}
 
-if (isset($_GET["id_siswa"])) {
-    $id_siswa = $_GET["id_siswa"];
+if (isset($_GET["id_rule"])) {
+    $id_rule = $_GET["id_rule"];
 } else {
-    header("Location: ../error.php?message=ID Siswa tidak ditemukan");
+    header("Location: ../error.php?message=ID Rule tidak ditemukan");
     exit;
 }
 
-if ($id_siswa === null) {
-    header("Location: ../error.php?message=ID Siswa tidak ditemukan");
+if ($id_rule === null) {
+    header("Location: ../error.php?message=ID Rule tidak ditemukan");
     exit;
 }
 
-if ($role == 'Admin') {
-    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
-} else {
-    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa AND user_id = $user_id");
-}
+$rule_fuzzy = query("SELECT * FROM rule_fuzzy WHERE id_rule = $id_rule")[0];
 
-
-if (empty($siswa)) {
-    header("Location: ../error.php?message=ID Siswa tidak valid");
+if (empty($rule_fuzzy)) {
+    header("Location: ../error.php?message=ID Rule tidak valid");
     exit;
 }
-$siswa = $siswa[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $result = editSiswa($_POST);
+    $result = editRule($_POST);
     if ($result > 0) {
         echo json_encode(["status" => "success", "message" => "Data Berhasil Diubah"]);
-    } elseif ($result == -1) {
-        echo json_encode(["status" => "error", "message" => "NIS Sudah Ada Sebelumnya"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Data Gagal Diubah"]);
+        echo json_encode(["status" => "error", "message" => "Rule Sudah Ada Sebelumnya"]);
     }
     exit;
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +53,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Siswa</title>
+    <title>Edit Rules</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -90,9 +86,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../dashboard">Home</a></li>
-                                <li class="breadcrumb-item">Data Siswa</li>
-                                <li class="breadcrumb-item">Edit</li>
-                                <li class="breadcrumb-item active"><?= $siswa["nama_siswa"]; ?></li>
+                                <li class="breadcrumb-item">Master Data</li>
+                                <li class="breadcrumb-item">Rule Fuzzy</li>
+                                <li class="breadcrumb-item active">Edit</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -108,64 +104,63 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <!-- general form elements -->
                             <div class="card card-primary">
                                 <div class="card-header">
-                                    <h3 class="card-title">Tambah Data</h3>
+                                    <h3 class="card-title">Edit Rule Fuzzy</h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <!-- form start -->
                                 <form method="POST" action="" enctype="multipart/form-data" id="myForm">
-                                    <input type="hidden" name="id_siswa" value="<?= $siswa["id_siswa"]; ?>">
+                                    <input type="hidden" name="id_rule" value="<?= $rule_fuzzy["id_rule"]; ?>">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="card-body">
                                                 <div class="form-group">
-                                                    <label for="username">NIS <span class="text-danger">*</span></label>
-                                                    <input type="number" class="form-control" name="nis" id="nis" placeholder="NIS" value="<?= $siswa["nis"]; ?>" required>
+                                                    <label for="nilai_uts">Nilai Ujian Tengeh Semester <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_uts" id="nilai_uts" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah" <?= ($rule_fuzzy["nilai_uts"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
+                                                        <option value="Sedang" <?= ($rule_fuzzy["nilai_uts"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
+                                                        <option value="Tinggi" <?= ($rule_fuzzy["nilai_uts"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
+                                                    </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="nama_siswa">Nama Siswa <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="nama_siswa" id="nama_siswa" placeholder="Nama Siswa" value="<?= $siswa["nama_siswa"]; ?>" required>
+                                                    <label for="nilai_uas">Nilai Ujian Akhir Semester <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_uas" id="nilai_uas" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah" <?= ($rule_fuzzy["nilai_uas"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
+                                                        <option value="Sedang" <?= ($rule_fuzzy["nilai_uas"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
+                                                        <option value="Tinggi" <?= ($rule_fuzzy["nilai_uas"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
+                                                    </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="alamat">Alamat <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="alamat" id="alamat" placeholder="Alamat" value="<?= $siswa["alamat"]; ?>" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="tanggal_lahir">Tanggal Lahir <span class="text-danger">*</span></label>
-                                                    <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" placeholder="Tanggal Lahir" value="<?= $siswa["tanggal_lahir"]; ?>" required>
+                                                    <label for="nilai_keaktifan">Nilai Keaktifan <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_keaktifan" id="nilai_keaktifan" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah" <?= ($rule_fuzzy["nilai_keaktifan"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
+                                                        <option value="Sedang" <?= ($rule_fuzzy["nilai_keaktifan"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
+                                                        <option value="Tinggi" <?= ($rule_fuzzy["nilai_keaktifan"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="card-body">
                                                 <div class="form-group">
-                                                    <label for="kelas">Kelas <span class="text-danger">*</span></label>
-                                                    <input type="kelas" class="form-control" name="kelas" id="kelas" placeholder="Kelas" value="<?= $siswa["kelas"]; ?>" required>
+                                                    <label for="nilai_penghasilan">Nilai Penghasilan <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_penghasilan" id="nilai_penghasilan" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah" <?= ($rule_fuzzy["nilai_penghasilan"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
+                                                        <option value="Sedang" <?= ($rule_fuzzy["nilai_penghasilan"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
+                                                        <option value="Tinggi" <?= ($rule_fuzzy["nilai_penghasilan"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
+                                                    </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Jenis Kelamin <span class="text-danger">*</span></label>
-                                                    <br>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="jenis_kelamin" id="Laki-Laki" value="Laki-Laki" <?= $siswa["jenis_kelamin"] == 'Laki-Laki' ? 'checked' : ''; ?>>
-                                                        <label class="form-check-label" for="Laki-Laki">Laki-laki</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="jenis_kelamin" id="Perempuan" value="Perempuan" <?= $siswa["jenis_kelamin"] == 'Perempuan' ? 'checked' : ''; ?>>
-                                                        <label class="form-check-label" for="Perempuan">Perempuan</label>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="no_telfon">No Telepon <span class="text-danger">*</span></label>
-                                                    <input type="number" class="form-control" name="no_telfon" id="no_telfon" placeholder="No Telepon" value="<?= $siswa["no_telfon"]; ?>" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="email">Email <span class="text-danger">*</span></label>
-                                                    <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="<?= $siswa["email"]; ?>" required>
+                                                    <label for="nilai">Nilai <span class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" name="nilai" id="nilai" value="<?= $rule_fuzzy["nilai"]; ?>" required>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- /.card-body -->
-
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-success">Submit Change</button>
                                     </div>
@@ -180,6 +175,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
+
         <!-- Main Footer -->
         <?php require_once '../partials/footer.php' ?>
     </div>
@@ -221,7 +217,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 text: res.message,
                                 icon: "success"
                             }).then(() => {
-                                window.location.href = '../data_siswa';
+                                window.location.href = '../rule_fuzzy';
                             });
                         } else {
                             Swal.fire('Error', res.message, 'error');

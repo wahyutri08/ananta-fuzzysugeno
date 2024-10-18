@@ -66,9 +66,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -119,56 +119,76 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <form method="POST" action="" enctype="multipart/form-data" id="myForm">
                                     <input type="hidden" name="id" value="<?= $users["id"]; ?>">
                                     <input type="hidden" name="avatarLama" value="<?= $users["avatar"]; ?>">
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label for="username">Username <span class="text-danger">*</span></label>
-                                            <input type="username" class="form-control" name="username" id="username" placeholder="Username" value="<?= $users["username"]; ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email <span class="text-danger">*</span></label>
-                                            <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="<?= $users["email"]; ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="nama">Nama <span class="text-danger">*</span></label>
-                                            <input type="nama" class="form-control" name="nama" id="nama" placeholder="Nama" value="<?= $users["nama"]; ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="password">Password <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="password2">Konfirmasi Password <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control" name="password2" id="password2" placeholder="Konfirmasi Password" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Role <span class="text-danger">*</span></label>
-                                            <select class="custom-select form-control" id="role" name="role">
-                                                <option value="Admin" <?= ($users["role"] == "Admin") ? "selected" : "" ?>>Admin</option>
-                                                <option value="Staff" <?= ($users["role"] == "Staff") ? "selected" : "" ?>>Staff</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Status <span class="text-danger">*</span></label>
-                                            <select class="custom-select form-control" id="status" name="status">
-                                                <option value="Aktif" <?= ($users["status"] == "Aktif") ? "selected" : "" ?>>Aktif</option>
-                                                <option value="Tidak Aktif" <?= ($users["status"] == "Tidak Aktif") ? "selected" : "" ?>>Tidak Aktif</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="avatar">Photo Profile</label>
-                                            <div class="input-group">
-                                                <div class="custom-file">
-                                                    <input type="file" class="form-control" name="avatar" id="avatar">
-                                                    <label class="custom-file-label" for="avatar">Choose file</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="username">Username <span class="text-danger">*</span></label>
+                                                    <input type="username" class="form-control" name="username" id="username" placeholder="Username" value="<?= $users["username"]; ?>" required>
                                                 </div>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">Upload</span>
+                                                <div class="form-group">
+                                                    <label for="email">Email <span class="text-danger">*</span></label>
+                                                    <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="<?= $users["email"]; ?>" required>
                                                 </div>
+                                                <div class="form-group">
+                                                    <label for="nama">Nama <span class="text-danger">*</span></label>
+                                                    <input type="nama" class="form-control" name="nama" id="nama" placeholder="Nama" value="<?= $users["nama"]; ?>" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="password">Password <span class="text-danger">*</span></label>
+                                                    <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="password2">Konfirmasi Password <span class="text-danger">*</span></label>
+                                                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Konfirmasi Password" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>Role <span class="text-danger">*</span></label>
+                                                    <select class="custom-select form-control" id="role" name="role">
+                                                        <option value="Admin" <?= ($users["role"] == "Admin") ? "selected" : "" ?>>Admin</option>
+                                                        <option value="Staff" <?= ($users["role"] == "Staff") ? "selected" : "" ?>>Staff</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Status <span class="text-danger">*</span></label>
+                                                    <select class="custom-select form-control" id="status" name="status">
+                                                        <option value="Aktif" <?= ($users["status"] == "Aktif") ? "selected" : "" ?>>Aktif</option>
+                                                        <option value="Tidak Aktif" <?= ($users["status"] == "Tidak Aktif") ? "selected" : "" ?>>Tidak Aktif</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="avatar">Photo Profile</label>
+                                                    <div class="input-group">
+                                                        <div class="custom-file">
+                                                            <input type="file" class="form-control" name="avatar" id="avatar">
+                                                            <label class="custom-file-label" for="avatar">Choose file</label>
+                                                        </div>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Upload</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-md-7 ml-5">
+                                                    <div class="card card-primary card-outline">
+                                                        <div class="card-body box-profile" style="height: 180px;">
+                                                            <div class="text-center">
+                                                                <img class="profile-user-img img-fluid img-circle"
+                                                                    src="../assets/dist/img/<?= $users["avatar"]; ?>"
+                                                                    style="width: 150px; height: 100px;">
+                                                            </div>
+                                                            <h3 class="profile-username text-center"><?= $users["nama"]; ?></h3>
+                                                            <p class="text-muted text-center"><?= $users["role"]; ?></p>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
                                     <!-- /.card-body -->
-
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-success">Submit Change</button>
                                     </div>
@@ -184,16 +204,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
         <!-- /.content-wrapper -->
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-            <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
-            </div>
-        </aside>
-        <!-- /.control-sidebar -->
-
         <!-- Main Footer -->
         <?php require_once '../partials/footer.php' ?>
     </div>
@@ -202,15 +212,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- REQUIRED SCRIPTS -->
 
     <!-- jQuery -->
-    <script src="../plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- bs-custom-file-input -->
-    <script src="../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../assets/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../dist/js/adminlte.min.js"></script>
+    <script src="../assets/dist/js/adminlte.min.js"></script>
     <!-- Sweetalert -->
-    <script src="../plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
         $(function() {
             bsCustomFileInput.init();

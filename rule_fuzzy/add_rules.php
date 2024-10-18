@@ -43,9 +43,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -97,33 +97,55 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="card-body">
-                                                <?php foreach ($variabel as $v) : ?>
-                                                    <div class="form-group">
-                                                        <label><?= $v["nama_variabel"]; ?> <span class="text-danger">*</span></label>
-                                                        <br>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="nilai_<?= $v["id_variabel"]; ?>" id="Rendah_<?= $v['id_variabel']; ?>" value=" Rendah">
-                                                            <label class="form-check-label" for="Rendah_<?= $v['id_variabel']; ?>">Rendah</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="nilai_<?= $v['id_variabel']; ?>" id="Sedang_<?= $v['id_variabel']; ?>" value="Sedang">
-                                                            <label class="form-check-label" for="Sedang_<?= $v['id_variabel']; ?>">Sedang</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="nilai_<?= $v['id_variabel']; ?>" id="Tinggi_<?= $v['id_variabel']; ?>" value="Tinggi">
-                                                            <label class="form-check-label" for="Tinggi_<?= $v['id_variabel']; ?>">Tinggi</label>
-                                                        </div>
-                                                    </div>
-                                                <?php endforeach; ?>
                                                 <div class="form-group">
-                                                    <label for="nilai">Nilai <span class="text-danger">*</span></label>
-                                                    <input type="number" class="form-control" name="nilai" id="nilai" placeholder="Nilai" required>
+                                                    <label for="nilai_uts">Nilai Ujian Tengeh Semester <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_uts" id="nilai_uts" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah">Rendah</option>
+                                                        <option value="Sedang">Sedang</option>
+                                                        <option value="Tinggi">Tinggi</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nilai_uas">Nilai Ujian Akhir Semester <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_uas" id="nilai_uas" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah">Rendah</option>
+                                                        <option value="Sedang">Sedang</option>
+                                                        <option value="Tinggi">Tinggi</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nilai_keaktifan">Nilai Keaktifan <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_keaktifan" id="nilai_keaktifan" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah">Rendah</option>
+                                                        <option value="Sedang">Sedang</option>
+                                                        <option value="Tinggi">Tinggi</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="nilai_penghasilan">Nilai Penghasilan <span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="nilai_penghasilan" id="nilai_penghasilan" required>
+                                                        <option value="" disabled selected>-Choose One-</option>
+                                                        <option value="Rendah">Rendah</option>
+                                                        <option value="Sedang">Sedang</option>
+                                                        <option value="Tinggi">Tinggi</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nilai">Nilai <span class="text-danger">*</span></label>
+                                                    <input type="number" class="form-control" name="nilai" id="nilai" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                     <!-- /.card-body -->
-
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-success">Submit</button>
                                     </div>
@@ -138,17 +160,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-            <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
-            </div>
-        </aside>
-        <!-- /.control-sidebar -->
-
         <!-- Main Footer -->
         <?php require_once '../partials/footer.php' ?>
     </div>
@@ -157,15 +168,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- REQUIRED SCRIPTS -->
 
     <!-- jQuery -->
-    <script src="../plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- bs-custom-file-input -->
-    <script src="../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../assets/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../dist/js/adminlte.min.js"></script>
+    <script src="../assets/dist/js/adminlte.min.js"></script>
     <!-- Sweetalert -->
-    <script src="../plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script>
         $(function() {
             bsCustomFileInput.init();

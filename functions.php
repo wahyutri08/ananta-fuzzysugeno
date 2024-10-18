@@ -135,7 +135,7 @@ function upload()
     $namaFileBaru .= '.';
     $namaFileBaru .= $ekstensiAvatar;
 
-    move_uploaded_file($tmpName, '../dist/img/' . $namaFileBaru);
+    move_uploaded_file($tmpName, '../assets/dist/img/' . $namaFileBaru);
 
     return $namaFileBaru;
 }
@@ -355,12 +355,11 @@ function deleteNilaiSiswa($id_siswa)
 function addRules($data)
 {
     global $db;
-    // // Ambil data dari POST dan sanitasi
-    $nilai_uts = mysqli_real_escape_string($db, $data['nilai_1']);
-    $nilai_uas = mysqli_real_escape_string($db, $data['nilai_2']);
-    $nilai_keaktifan = mysqli_real_escape_string($db, $data['nilai_3']);
-    $nilai_penghasilan = mysqli_real_escape_string($db, $data['nilai_4']);
-    $nilai = mysqli_real_escape_string($db, $data['nilai']); // Pastikan nilai ini ada dalam form
+    $nilai_uts = mysqli_real_escape_string($db, $data['nilai_uts']);
+    $nilai_uas = mysqli_real_escape_string($db, $data['nilai_uas']);
+    $nilai_keaktifan = mysqli_real_escape_string($db, $data['nilai_keaktifan']);
+    $nilai_penghasilan = mysqli_real_escape_string($db, $data['nilai_penghasilan']);
+    $nilai = mysqli_real_escape_string($db, $data['nilai']);
 
     // Cek apakah data yang sama sudah ada di database
     $checkQuery = "SELECT COUNT(*) as count FROM rule_fuzzy 
@@ -372,18 +371,61 @@ function addRules($data)
     $result = mysqli_query($db, $checkQuery);
     $row = mysqli_fetch_assoc($result);
 
+    // Jika data sudah ada, return 0 atau pesan error
     if ($row['count'] > 0) {
-        // Jika data sudah ada, return 0 atau pesan error
-        return 0; // Data tidak dimasukkan karena sudah ada
+        return 0;
     } else {
-        // Query untuk memasukkan data ke tabel jika belum ada
         $query = "INSERT INTO rule_fuzzy (nilai_uts, nilai_uas, nilai_keaktifan, nilai_penghasilan, nilai) 
-                  VALUES ('$nilai_uts', '$nilai_uas', '$nilai_keaktifan', '$nilai_penghasilan', '$nilai')";
-        mysqli_query($db, $query);
+                  VALUES ('$nilai_uts', 
+                          '$nilai_uas', 
+                          '$nilai_keaktifan', 
+                          '$nilai_penghasilan', 
+                          '$nilai')";
 
-        // Mengembalikan jumlah baris yang terpengaruh
+        mysqli_query($db, $query);
         return mysqli_affected_rows($db);
     }
+}
+
+function editRule($data)
+{
+    global $db;
+    $id_rule = $data["id_rule"];
+    $nilai_uts = mysqli_real_escape_string($db, $data['nilai_uts']);
+    $nilai_uas = mysqli_real_escape_string($db, $data['nilai_uas']);
+    $nilai_keaktifan = mysqli_real_escape_string($db, $data['nilai_keaktifan']);
+    $nilai_penghasilan = mysqli_real_escape_string($db, $data['nilai_penghasilan']);
+    $nilai = mysqli_real_escape_string($db, $data['nilai']);
+
+    $checkQuery = "SELECT COUNT(*) as count FROM rule_fuzzy 
+                   WHERE nilai_uts = '$nilai_uts' 
+                   AND nilai_uas = '$nilai_uas' 
+                   AND nilai_keaktifan = '$nilai_keaktifan' 
+                   AND nilai_penghasilan = '$nilai_penghasilan'";
+
+    $result = mysqli_query($db, $checkQuery);
+    $row = mysqli_fetch_assoc($result);
+
+    // Jika data sudah ada, return 0 atau pesan error
+    if ($row['count'] > 0) {
+        return 0;
+    } else {
+        $query = "UPDATE rule_fuzzy SET nilai_uts = '$nilai_uts',
+                                        nilai_uas = '$nilai_uas',
+                                        nilai_keaktifan = '$nilai_keaktifan',
+                                        nilai_penghasilan = '$nilai_penghasilan',
+                                        nilai = '$nilai' WHERE id_rule = $id_rule ";
+
+        mysqli_query($db, $query);
+        return mysqli_affected_rows($db);
+    }
+}
+
+function deleteRule($id_rule)
+{
+    global $db;
+    mysqli_query($db, "DELETE FROM rule_fuzzy WHERE id_rule = $id_rule");
+    return mysqli_affected_rows($db);
 }
 
 function is_user_active($id)
@@ -457,6 +499,19 @@ function searchSiswa($keyword)
              ";
     return query($query);
 }
+
+
+// function searchRules($keyword)
+// {
+//     $query = "SELECT * FROM rule_fuzzy WHERE
+//                 nis LIKE '%$keyword%' OR
+//                 nama_siswa LIKE '%$keyword%' OR
+//                 kelas LIKE '%$keyword%' OR
+//                 email LIKE '%$keyword%' OR
+//                 no_telfon LIKE '%$keyword%'
+//              ";
+//     return query($query);
+// }
 
 
 function generatePagination($jumlahHalaman, $halamanAktif)
