@@ -11,20 +11,57 @@ if ($_SESSION['role'] !== 'Admin') {
     exit;
 }
 
-$jumlahDataPerHalaman = 10;
-$jumlahData = count(query("SELECT * FROM users"));
-$jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-$halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
-$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+// $jumlahDataPerHalaman = 10;
+// $jumlahData = count(query("SELECT * FROM users"));
+// $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+// $halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
+// $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$users = query("SELECT * FROM users LIMIT $awalData, $jumlahDataPerHalaman");
-if (isset($_POST["search"])) {
-    $users = searchUsers($_POST["keyword"]);
+// $users = query("SELECT * FROM users LIMIT $awalData, $jumlahDataPerHalaman");
+// if (isset($_POST["search"])) {
+//     $users = searchUsers($_POST["keyword"]);
+// }
+
+// if ($halamanAktif > $jumlahHalaman) {
+//     header("Location: ../user_management");
+//     exit();
+// }
+
+$jumlahDataPerHalaman = 10;
+$keyword = isset($_POST["keyword"]) ? $_POST["keyword"] : '';
+
+// Cek apakah ada pencarian
+if (!empty($keyword)) {
+    $jumlahData = count(query("SELECT * FROM users WHERE 
+                    username LIKE '%$keyword%' OR
+                    email LIKE '%$keyword%' OR
+                    nama LIKE '%$keyword%' OR
+                    role LIKE '%$keyword%' OR
+                    status LIKE '%$keyword%'"));
+} else {
+    $jumlahData = count(query("SELECT * FROM users"));
 }
 
-if ($halamanAktif > $jumlahHalaman) {
-    header("Location: ../user_management");
-    exit();
+$jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+
+if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
+    $halamanAktif = (int)$_GET["page"];
+} else {
+    $halamanAktif = 1;
+}
+
+$startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
+
+// Query berdasarkan pencarian dan role
+if (!empty($keyword)) {
+    $users = query("SELECT * FROM users WHERE 
+                    username LIKE '%$keyword%' OR
+                    email LIKE '%$keyword%' OR
+                    nama LIKE '%$keyword%' OR
+                    role LIKE '%$keyword%' OR
+                    status LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+} else {
+    $users = query("SELECT * FROM users LIMIT $startData, $jumlahDataPerHalaman");
 }
 
 ?>
@@ -94,7 +131,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         <form action="" method="POST">
                                             <div class="input-group input-group-sm" style="width: 150px;">
                                                 <input type="text" id="keyword" name="keyword" class="form-control float-right" placeholder="Search">
-
                                                 <div class="input-group-append">
                                                     <button type="submit" class="btn btn-default">
                                                         <i class="fas fa-search"></i>
@@ -119,70 +155,67 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $n = 1; ?>
-                                            <?php foreach ($users as $userData) : ?>
+                                            <?php $n = 1 + $startData; ?>
+                                            <?php if ($jumlahData > 0): ?>
+                                                <?php foreach ($users as $userData) : ?>
+                                                    <tr>
+                                                        <td><?= $n; ?></td>
+                                                        <!-- <td><?= $userData["id"]; ?></td> -->
+                                                        <td><?= $userData["username"]; ?></td>
+                                                        <td><?= $userData["nama"]; ?></td>
+                                                        <td><?= $userData["email"]; ?></td>
+                                                        <td>
+                                                            <?php
+                                                            if ($userData['role'] == 'Admin') {
+                                                                echo '<span class="badge bg-success">' . $userData["role"] . '</span>';
+                                                            } else {
+                                                                echo '<span class="badge bg-warning">' . $userData["role"] . '</span>';
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                            if ($userData['status'] == 'Aktif') {
+                                                                echo '<span class="badge bg-success">' . $userData["status"] . '</span>';
+                                                            } else {
+                                                                echo '<span class="badge bg-danger">' . $userData["status"] . '</span>';
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
+                                                                    Action
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                    <li><a class="dropdown-item" href="edit_users.php?id=<?= $userData["id"]; ?>">Edit</a></li>
+                                                                    <li><a class="dropdown-item tombol-hapus" href="delete_users.php?id=<?= $userData["id"]; ?>">Delete</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $n++; ?>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
                                                 <tr>
-                                                    <td><?= $n; ?></td>
-                                                    <!-- <td><?= $userData["id"]; ?></td> -->
-                                                    <td><?= $userData["username"]; ?></td>
-                                                    <td><?= $userData["nama"]; ?></td>
-                                                    <td><?= $userData["email"]; ?></td>
-                                                    <td>
-                                                        <?php
-                                                        if ($userData['role'] == 'Admin') {
-                                                            echo '<span class="badge bg-success">' . $userData["role"] . '</span>';
-                                                        } else {
-                                                            echo '<span class="badge bg-warning">' . $userData["role"] . '</span>';
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php
-                                                        if ($userData['status'] == 'Aktif') {
-                                                            echo '<span class="badge bg-success">' . $userData["status"] . '</span>';
-                                                        } else {
-                                                            echo '<span class="badge bg-danger">' . $userData["status"] . '</span>';
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
-                                                                Action
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                <li><a class="dropdown-item" href="edit_users.php?id=<?= $userData["id"]; ?>">Edit</a></li>
-                                                                <li><a class="dropdown-item tombol-hapus" href="delete_users.php?id=<?= $userData["id"]; ?>">Delete</a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
+                                                    <td colspan="9" class="text-center">No data found</td>
                                                 </tr>
-                                                <?php $n++; ?>
-                                            <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-footer clearfix">
-                                    <ul class="pagination pagination-sm m-0 float-right">
-                                        <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                        <?php
-                                        // Batasi jumlah maksimum item navigasi menjadi 5
-                                        $jumlahTampil = min(5, $jumlahHalaman);
-                                        // Hitung titik awal iterasi untuk tetap berada di tengah
-                                        $start = max(1, min($halamanAktif - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
-                                        // Hitung titik akhir iterasi
-                                        $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
-
-                                        for ($i = $start; $i <= $end; $i++) :
-                                            if ($i == $halamanAktif) : ?>
-                                                <li class="page-item active"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                            <?php else : ?>
-                                                <li class="page-item"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                        <?php endif;
-                                        endfor; ?>
-                                        <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
-                                    </ul>
+                                    <div class="showing-entries">
+                                        <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <ul class="pagination pagination-sm m-0 float-right">
+                                            <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
+                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <?php endfor; ?>
+                                            <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -253,68 +286,79 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 });
             });
 
-            // Fungsi untuk menangani kueri pencarian
             function handleSearchQuery() {
                 var keyword = $('#keyword').val();
-                $.get('../ajax/data_users.php?keyword=' + keyword, function(data) {
+                $.get('../ajax/user_management.php?keyword=' + keyword, function(data) {
                     $('#tabel').html(data);
-                    // Initialize ulang tombol-hapus setelah memuat data baru
-                    $('.tombol-hapus').on('click', function(e) {
-                        e.preventDefault();
-                        const href = $(this).attr('href');
 
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "Data Akan Dihapus",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.value) {
-                                $.ajax({
-                                    url: href,
-                                    type: 'GET',
-                                    success: function(response) {
-                                        let res = JSON.parse(response);
-                                        if (res.status === 'success') {
-                                            Swal.fire({
-                                                title: 'Deleted!',
-                                                text: 'Data Berhasil Dihapus',
-                                                icon: 'success',
-                                                showConfirmButton: true
-                                            }).then(() => {
-                                                window.location.href = '../user_management';
-                                            });
-                                        } else if (res.status === 'error') {
-                                            Swal.fire('Error', 'Data Gagal Dihapus', 'error');
-                                        } else if (res.status === 'redirect') {
-                                            window.location.href = '../login';
+                    if (data.trim() === "") {
+                        $('#tabel').html('<tr><td colspan="9" class="text-center">No data found</td></tr>');
+                        updateShowingEntries(0, 0, 1);
+                    } else {
+                        $('.tombol-hapus').on('click', function(e) {
+                            e.preventDefault();
+                            const href = $(this).attr('href');
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "Data Akan Dihapus",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, delete it!'
+                            }).then((result) => {
+                                if (result.value) {
+                                    $.ajax({
+                                        url: href,
+                                        type: 'GET',
+                                        success: function(response) {
+                                            let res = JSON.parse(response);
+                                            if (res.status === 'success') {
+                                                Swal.fire({
+                                                    title: 'Deleted!',
+                                                    text: 'Data Berhasil Dihapus',
+                                                    icon: 'success',
+                                                    showConfirmButton: true
+                                                }).then(() => {
+                                                    window.location.href = '../user_management';
+                                                });
+                                            } else if (res.status === 'error') {
+                                                Swal.fire('Error', 'Data Gagal Dihapus', 'error');
+                                            } else if (res.status === 'redirect') {
+                                                window.location.href = '../login';
+                                            }
+                                        },
+                                        error: function() {
+                                            Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
                                         }
-                                    },
-                                    error: function() {
-                                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
-                                    }
-                                });
-                            }
+                                    });
+                                }
+                            });
                         });
-                    });
+                    }
                 });
             }
 
-            // Sembunyikan tombol cari saat halaman dimuat
-            $('#tombol-cari').hide();
+            function updateShowingEntries(jumlahData, jumlahDataPerHalaman, halamanSekarang) {
+                if (jumlahData === 0) {
+                    $('#showing-entries').html('Showing 0 entries');
+                } else {
+                    var startEntry = (halamanSekarang - 1) * jumlahDataPerHalaman + 1;
+                    var endEntry = Math.min(halamanSekarang * jumlahDataPerHalaman, jumlahData);
+                    $('#showing-entries').html('Showing ' + startEntry + ' to ' + endEntry + ' of ' + jumlahData + ' entries');
+                }
+            }
 
-            // Event ketika tombol cari ditekan
             $('#tombol-cari').on('click', function(e) {
                 e.preventDefault();
                 handleSearchQuery();
             });
-
-            // Event ketika mengetik di kolom pencarian
-            $('#keyword').on('keyup', function() {
-                handleSearchQuery();
+            $('#keyword').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#tombol-cari').click();
+                }
             });
         });
     </script>

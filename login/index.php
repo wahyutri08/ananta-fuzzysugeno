@@ -73,7 +73,7 @@ if (isset($_POST["login"])) {
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="../login" class="h1"><b>PUSING</b></a>
+                <a href="../login" class="h1"><b>JOKI NYA PUSING</b></a>
             </div>
             <div class="card-body">
                 <?php if ($error) : ?>

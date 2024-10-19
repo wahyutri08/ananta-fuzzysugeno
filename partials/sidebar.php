@@ -87,9 +87,9 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                 <!-- <li class="nav-header">PROSES</li> -->
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-book"></i>
+                        <i class="nav-icon fa-solid fa-gears"></i>
                         <p>
-                            Proses Beasiswa
+                            Keputusan
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>

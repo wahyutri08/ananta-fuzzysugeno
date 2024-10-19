@@ -109,7 +109,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                 <input type="text" id="keyword" name="keyword" class="form-control float-right" placeholder="Search">
 
                                                 <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-default" disabled>
+                                                    <button type="submit" class="btn btn-default">
                                                         <i class="fas fa-search"></i>
                                                     </button>
                                                 </div>

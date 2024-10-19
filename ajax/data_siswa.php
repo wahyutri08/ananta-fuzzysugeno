@@ -31,25 +31,29 @@ $jumlahData = $resultTotal[0]['jumlah'];
 // Menghitung jumlah halaman
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
-// Mendefinisikan tautan pagination secara langsung
-$pagination = '<div class="card-footer clearfix">';
-$pagination = '<ul class="pagination pagination-sm m-0 float-right">';
-$pagination .= '<li class="page-item"><a class="page-link" href="?page=' . max(1, $page - 1) . '">Previous</a></li>';
+// // Mendefinisikan tautan pagination
+// $pagination = '<div class="card-footer clearfix">';
+// $pagination .= '<ul class="pagination pagination-sm m-0 float-right">';
+// $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . max(1, $page - 1) . '">Previous</a></li>';
 
-$jumlahTampil = min(5, $jumlahHalaman);
-$start = max(1, min($page - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
-$end = min($start + $jumlahTampil - 1, $jumlahHalaman);
+// $jumlahTampil = min(5, $jumlahHalaman);
+// $start = max(1, min($page - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
+// $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
 
-for ($i = $start; $i <= $end; $i++) {
-    if ($i == $page) {
-        $pagination .= '<li class="page-item active"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-    } else {
-        $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-    }
-}
-$pagination .= '<li class="page-item"><a class="page-link" href="?page=' . min($jumlahHalaman, $page + 1) . '">Next</a></li>';
-$pagination .= '</ul>';
-$pagination = '</div>';
+// for ($i = $start; $i <= $end; $i++) {
+//     if ($i == $page) {
+//         $pagination .= '<li class="page-item active"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+//     } else {
+//         $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+//     }
+// }
+// $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . min($jumlahHalaman, $page + 1) . '">Next</a></li>';
+// $pagination .= '</ul>';
+
+// // Jika ada data, tampilkan informasi showing-entries
+// $pagination .= '<span id="showing-entries">Showing ' . ($awalData + 1) . ' to ' . min($awalData + $jumlahDataPerHalaman, $jumlahData) . ' of ' . $jumlahData . ' entries</span>';
+// $pagination .= '</div>';
+
 ?>
 
 <div class="card-body table-responsive p-0" id="tabel">
@@ -68,32 +72,38 @@ $pagination = '</div>';
             </tr>
         </thead>
         <tbody>
-            <?php $n = 1; ?>
-            <?php foreach ($d_siswa as $siswa) : ?>
+            <?php $n = 1 + $awalData; ?>
+            <?php if ($jumlahData > 0): ?>
+                <?php foreach ($d_siswa as $siswa): ?>
+                    <tr>
+                        <td><?= $n; ?></td>
+                        <td><?= $siswa["nis"]; ?></td>
+                        <td><?= $siswa["nama_siswa"]; ?></td>
+                        <td><?= $siswa["alamat"]; ?></td>
+                        <td><?= $siswa["tanggal_lahir"]; ?></td>
+                        <td><?= $siswa["kelas"]; ?></td>
+                        <td><?= $siswa["jenis_kelamin"]; ?></td>
+                        <td><?= $siswa["no_telfon"]; ?></td>
+                        <td><?= $siswa["email"]; ?></td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
+                                    Action
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="edit_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a></li>
+                                    <li><a class="dropdown-item tombol-hapus" href="delete_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Delete</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php $n++; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
                 <tr>
-                    <td><?= $n; ?></td>
-                    <td><?= $siswa["nis"]; ?></td>
-                    <td><?= $siswa["nama_siswa"]; ?></td>
-                    <td><?= $siswa["alamat"]; ?></td>
-                    <td><?= $siswa["tanggal_lahir"]; ?></td>
-                    <td><?= $siswa["kelas"]; ?></td>
-                    <td><?= $siswa["jenis_kelamin"]; ?></td>
-                    <td><?= $siswa["no_telfon"]; ?></td>
-                    <td><?= $siswa["email"]; ?></td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
-                                Action
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="edit_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a></li>
-                                <li><a class="dropdown-item tombol-hapus" href="delete_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Delete</a></li>
-                            </ul>
-                        </div>
-                    </td>
+                    <td colspan="9" class="text-center">No data found</td>
                 </tr>
-                <?php $n++; ?>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>

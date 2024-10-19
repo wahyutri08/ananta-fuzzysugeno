@@ -10,72 +10,50 @@ $user_id = $_SESSION['id'];
 $role = $_SESSION['role'];
 
 $jumlahDataPerHalaman = 10;
-if (isset($_POST["keyword"])) {
-    $keyword = $_POST["keyword"];
-} else {
-    $keyword = '';
-}
 
-
-// Cek apakah ada pencarian
-if (!empty($keyword)) {
-    if ($role == 'Admin') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%'"));
-    } elseif ($role == 'Staff') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%'"));
-    }
-} else {
-    if ($role == 'Admin') {
-        $jumlahData = count(query("SELECT * FROM siswa"));
-    } elseif ($role == 'Staff') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
-    }
+if ($role == 'Admin') {
+    $jumlahData = count(query("SELECT * FROM siswa"));
+} elseif ($role == 'Staff') {
+    $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
 }
 
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
 if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
     $halamanAktif = (int)$_GET["page"];
 } else {
     $halamanAktif = 1;
 }
+// $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
+// Query berdasarkan role pengguna
+if ($role == 'Admin') {
+    $d_siswa = query("SELECT * FROM siswa LIMIT " . (($halamanAktif - 1) * $jumlahDataPerHalaman) . ", $jumlahDataPerHalaman");
+} elseif ($role == 'Staff') {
+    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT " . (($halamanAktif - 1) * $jumlahDataPerHalaman) . ", $jumlahDataPerHalaman");
+}
 
-// Query berdasarkan pencarian dan role
-if (!empty($keyword)) {
+// Jika ada pencarian
+if (isset($_POST["search"])) {
+    $keyword = $_POST["keyword"];
     if ($role == 'Admin') {
-        $d_siswa = query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+        $d_siswa = searchSiswa($keyword);  // Admin bisa mencari semua data
     } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
-    }
-} else {
-    if ($role == 'Admin') {
-        $d_siswa = query("SELECT * FROM siswa LIMIT $startData, $jumlahDataPerHalaman");
-    } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $startData, $jumlahDataPerHalaman");
+        // Staff hanya bisa mencari data yang terkait dengan dirinya
+        $d_siswa = searchSiswa($keyword, $user_id);
     }
 }
+
+// $jumlahDataPerHalaman = 10;
+// $jumlahData = count(query("SELECT * FROM rule_fuzzy"));
+// $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+// if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
+//     $halamanAktif = (int)$_GET["page"];
+// } else {
+//     $halamanAktif = 1;
+// }
+
+
+// $rules_fuzzy = query("SELECT * FROM rule_fuzzy LIMIT " . (($halamanAktif - 1) * $jumlahDataPerHalaman) . ", $jumlahDataPerHalaman");
 ?>
 
 
@@ -124,7 +102,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="../dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
                                 <li class="breadcrumb-item active">Data Siswa</li>
                             </ol>
                         </div><!-- /.col -->
@@ -153,7 +131,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                 <input type="text" id="keyword" name="keyword" class="form-control float-right" placeholder="Search">
 
                                                 <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-default">
+                                                    <button type="submit" class="btn btn-default" disabled>
                                                         <i class="fas fa-search"></i>
                                                     </button>
                                                 </div>
@@ -178,50 +156,53 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $n = 1 + $startData; ?>
-                                            <?php if ($jumlahData > 0): ?>
-                                                <?php foreach ($d_siswa as $siswa): ?>
-                                                    <tr>
-                                                        <td><?= $n; ?></td>
-                                                        <td><?= $siswa["nis"]; ?></td>
-                                                        <td><?= $siswa["nama_siswa"]; ?></td>
-                                                        <td><?= $siswa["alamat"]; ?></td>
-                                                        <td><?= $siswa["tanggal_lahir"]; ?></td>
-                                                        <td><?= $siswa["kelas"]; ?></td>
-                                                        <td><?= $siswa["jenis_kelamin"]; ?></td>
-                                                        <td><?= $siswa["no_telfon"]; ?></td>
-                                                        <td><?= $siswa["email"]; ?></td>
-                                                        <td>
-                                                            <div class="dropdown">
-                                                                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
-                                                                    Action
-                                                                </button>
-                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                    <li><a class="dropdown-item" href="edit_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a></li>
-                                                                    <li><a class="dropdown-item tombol-hapus" href="delete_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Delete</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <?php $n++; ?>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
+                                            <?php $n = 1; ?>
+                                            <?php foreach ($d_siswa as $siswa) : ?>
                                                 <tr>
-                                                    <td colspan="9" class="text-center">No data found</td>
+                                                    <td><?= $n; ?></td>
+                                                    <td><?= $siswa["nis"]; ?></td>
+                                                    <td><?= $siswa["nama_siswa"]; ?></td>
+                                                    <td><?= $siswa["alamat"]; ?></td>
+                                                    <td><?= $siswa["tanggal_lahir"]; ?></td>
+                                                    <td><?= $siswa["kelas"]; ?></td>
+                                                    <td><?= $siswa["jenis_kelamin"]; ?></td>
+                                                    <td><?= $siswa["no_telfon"]; ?></td>
+                                                    <td><?= $siswa["email"]; ?></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
+                                                                Action
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                <li><a class="dropdown-item" href="edit_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a></li>
+                                                                <li><a class="dropdown-item tombol-hapus" href="delete_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Delete</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
                                                 </tr>
-                                            <?php endif; ?>
+                                                <?php $n++; ?>
+                                            <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-footer clearfix">
                                     <div class="showing-entries">
-                                        <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <span id="showing-entries">Showing 1 to 10 of <?= $jumlahData ?> entries</span>
                                         <ul class="pagination pagination-sm m-0 float-right">
                                             <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
-                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                            <?php endfor; ?>
+                                            <?php
+                                            $jumlahTampil = min(5, $jumlahHalaman);
+                                            $start = max(1, min($halamanAktif - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
+                                            $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
+
+                                            for ($i = $start; $i <= $end; $i++) :
+                                                if ($i == $halamanAktif) : ?>
+                                                    <li class="page-item active"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                                <?php else : ?>
+                                                    <li class="page-item"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <?php endif;
+                                            endfor; ?>
                                             <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
                                         </ul>
                                     </div>
@@ -235,6 +216,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+            <div class="p-3">
+                <h5>Title</h5>
+                <p>Sidebar content</p>
+            </div>
+        </aside>
+        <!-- /.control-sidebar -->
 
         <!-- Main Footer -->
         <?php require_once '../partials/footer.php' ?>
@@ -251,6 +242,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="../assets/dist/js/adminlte.min.js"></script>
     <!-- Sweetalert -->
     <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil total data dan data per halaman dari PHP
+            const totalEntries = <?= $jumlahData ?>;
+            const entriesPerPage = <?= $jumlahDataPerHalaman ?>;
+            const currentPage = <?= $halamanAktif ?>;
+
+            // Hitung entri awal dan entri akhir
+            const startEntry = (currentPage - 1) * entriesPerPage + 1;
+            const endEntry = Math.min(startEntry + entriesPerPage - 1, totalEntries);
+
+            // Update teks di elemen showing-entries
+            const showingEntries = document.getElementById('showing-entries');
+            showingEntries.textContent = `Showing ${startEntry} to ${endEntry} of ${totalEntries} entries`;
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $('.tombol-hapus').on('click', function(e) {
@@ -295,80 +302,68 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 });
             });
 
+            // Fungsi untuk menangani kueri pencarian
             function handleSearchQuery() {
                 var keyword = $('#keyword').val();
                 $.get('../ajax/data_siswa.php?keyword=' + keyword, function(data) {
                     $('#tabel').html(data);
+                    // Initialize ulang tombol-hapus setelah memuat data baru
+                    $('.tombol-hapus').on('click', function(e) {
+                        e.preventDefault();
+                        const href = $(this).attr('href');
 
-                    if (data.trim() === "") {
-                        $('#tabel').html('<tr><td colspan="9" class="text-center">No data found</td></tr>');
-                        updateShowingEntries(0, 0, 1);
-                    } else {
-                        $('.tombol-hapus').on('click', function(e) {
-                            e.preventDefault();
-                            const href = $(this).attr('href');
-
-                            Swal.fire({
-                                title: 'Are you sure?',
-                                text: "Data Akan Dihapus",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33',
-                                confirmButtonText: 'Yes, delete it!'
-                            }).then((result) => {
-                                if (result.value) {
-                                    $.ajax({
-                                        url: href,
-                                        type: 'GET',
-                                        success: function(response) {
-                                            let res = JSON.parse(response);
-                                            if (res.status === 'success') {
-                                                Swal.fire({
-                                                    title: 'Deleted!',
-                                                    text: 'Data Berhasil Dihapus',
-                                                    icon: 'success',
-                                                    showConfirmButton: true
-                                                }).then(() => {
-                                                    window.location.href = '../data_siswa';
-                                                });
-                                            } else if (res.status === 'error') {
-                                                Swal.fire('Error', 'Data Gagal Dihapus', 'error');
-                                            } else if (res.status === 'redirect') {
-                                                window.location.href = '../login';
-                                            }
-                                        },
-                                        error: function() {
-                                            Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Data Akan Dihapus",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.value) {
+                                $.ajax({
+                                    url: href,
+                                    type: 'GET',
+                                    success: function(response) {
+                                        let res = JSON.parse(response);
+                                        if (res.status === 'success') {
+                                            Swal.fire({
+                                                title: 'Deleted!',
+                                                text: 'Data Berhasil Dihapus',
+                                                icon: 'success',
+                                                showConfirmButton: true
+                                            }).then(() => {
+                                                window.location.href = '../data_siswa';
+                                            });
+                                        } else if (res.status === 'error') {
+                                            Swal.fire('Error', 'Data Gagal Dihapus', 'error');
+                                        } else if (res.status === 'redirect') {
+                                            window.location.href = '../login';
                                         }
-                                    });
-                                }
-                            });
+                                    },
+                                    error: function() {
+                                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                                    }
+                                });
+                            }
                         });
-                    }
+                    });
                 });
             }
 
-            function updateShowingEntries(jumlahData, jumlahDataPerHalaman, halamanSekarang) {
-                if (jumlahData === 0) {
-                    $('#showing-entries').html('Showing 0 entries');
-                } else {
-                    var startEntry = (halamanSekarang - 1) * jumlahDataPerHalaman + 1;
-                    var endEntry = Math.min(halamanSekarang * jumlahDataPerHalaman, jumlahData);
-                    $('#showing-entries').html('Showing ' + startEntry + ' to ' + endEntry + ' of ' + jumlahData + ' entries');
-                }
-            }
+            // Sembunyikan tombol cari saat halaman dimuat
+            $('#tombol-cari').hide();
 
+            // Event ketika tombol cari ditekan
             $('#tombol-cari').on('click', function(e) {
                 e.preventDefault();
                 handleSearchQuery();
             });
 
-            $('#keyword').on('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    $('#tombol-cari').click();
-                }
+            // Event ketika mengetik di kolom pencarian
+            $('#keyword').on('keyup', function() {
+                handleSearchQuery();
             });
         });
     </script>

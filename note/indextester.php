@@ -6,15 +6,27 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
-    exit;
-}
-
-$variabel = query("SELECT * FROM variabel");
+$user_id = $_SESSION['id'];
+$role = $_SESSION['role'];
 
 $jumlahDataPerHalaman = 10;
-$jumlahData = count(query("SELECT * FROM rule_fuzzy"));
+$keyword = isset($_POST["keyword"]) ? $_POST["keyword"] : '';
+
+// Cek apakah ada pencarian
+if (!empty($keyword)) {
+    if ($role == 'Admin') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE nama_siswa LIKE '%$keyword%'"));
+    } elseif ($role == 'Staff') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND nama_siswa LIKE '%$keyword%'"));
+    }
+} else {
+    if ($role == 'Admin') {
+        $jumlahData = count(query("SELECT * FROM siswa"));
+    } elseif ($role == 'Staff') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
+    }
+}
+
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
 if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
@@ -24,63 +36,61 @@ if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_
 }
 
 $startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
-$rule_fuzzy = query("SELECT * FROM rule_fuzzy LIMIT $startData, $jumlahDataPerHalaman");
 
-
+// Query berdasarkan pencarian dan role
+if (!empty($keyword)) {
+    if ($role == 'Admin') {
+        $d_siswa = query("SELECT * FROM siswa WHERE nama_siswa LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+    } elseif ($role == 'Staff') {
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND nama_siswa LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+    }
+} else {
+    if ($role == 'Admin') {
+        $d_siswa = query("SELECT * FROM siswa LIMIT $startData, $jumlahDataPerHalaman");
+    } elseif ($role == 'Staff') {
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $startData, $jumlahDataPerHalaman");
+    }
+}
 ?>
+
 <!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rule Fuzzy</title>
+    <title>Data Siswa</title>
 
-    <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
-    <!-- <link href="../assets/plugins/fontawesome-free/css/fontawesome.css" rel="stylesheet" />
-  <link href="../assets/plugins/fontawesome-free/css/brands.css" rel="stylesheet" />
-  <link href="../assets/plugins/fontawesome-free/css/solid.css" rel="stylesheet" /> -->
-    <!-- Theme style -->
     <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <div class="wrapper">
-
         <!-- Navbar -->
         <?php require_once '../partials/navbar.php' ?>
-        <!-- /.navbar -->
-
-        <!-- Main Sidebar Container -->
+        <!-- Sidebar -->
         <?php require_once '../partials/sidebar.php' ?>
-        <!-- End Sidebar -->
 
-        <!-- Content Wrapper. Contains page content -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Rule Fuzzy</h1>
-                        </div><!-- /.col -->
+                            <h1 class="m-0">Data Siswa</h1>
+                        </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Rule Fuzzy</li>
+                                <li class="breadcrumb-item active">Data Siswa</li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- /.content-header -->
 
             <!-- Main content -->
             <div class="content">
@@ -89,66 +99,69 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
-                                    <h3 class="card-title"><a href="add_rules.php" class="btn btn-sm btn-block bg-gradient-primary"><i class="fas fa-plus"></i> Tambah Data</a></h3>
+                                    <?php if ($role == 'Staff') : ?>
+                                        <h3 class="card-title"><a href="add_siswa.php" class="btn btn-sm btn-block bg-gradient-primary"><i class="fas fa-plus"></i> Tambah Data</a></h3>
+                                    <?php endif; ?>
                                     <div class="card-tools mt-2">
-                                        <!-- <form action="" method="POST">
+                                        <form action="" method="POST">
                                             <div class="input-group input-group-sm" style="width: 150px;">
                                                 <input type="text" id="keyword" name="keyword" class="form-control float-right" placeholder="Search">
-
                                                 <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-default" disabled>
+                                                    <button type="submit" class="btn btn-default">
                                                         <i class="fas fa-search"></i>
                                                     </button>
                                                 </div>
                                             </div>
-                                        </form> -->
+                                        </form>
                                     </div>
                                 </div>
-                                <!-- /.card-header -->
+
+                                <!-- Table -->
                                 <div class="card-body table-responsive p-0" id="tabel">
-                                    <table class="table table-hover text-nowrap" id="example2">
+                                    <table class="table table-hover text-nowrap">
                                         <thead>
                                             <tr>
-                                                <th style="width: 10px">No</th>
-                                                <?php foreach ($variabel as $v) : ?>
-                                                    <th><?= $v["nama_variabel"]; ?></th>
-                                                <?php endforeach; ?>
-                                                <th>Nilai</th>
+                                                <th>No</th>
+                                                <th>NIS</th>
+                                                <th>Nama Siswa</th>
+                                                <th>Alamat</th>
+                                                <th>Tanggal Lahir</th>
+                                                <th>Kelas</th>
+                                                <th>Jenis Kelamin</th>
+                                                <th>No Telepon</th>
+                                                <th>Email</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <?php
+                                            if ($jumlahData == 0) {
+                                                echo '<tr><td colspan="9" class="text-center">No data found</td></tr>';
+                                                return; // Stop script jika tidak ada data
+                                            }
+                                            ?>
                                             <?php $n = 1 + $startData; ?>
-                                            <?php if ($jumlahData > 0): ?>
-                                                <?php foreach ($rule_fuzzy as $f) : ?>
-                                                    <tr>
-                                                        <td><?= $n; ?></td>
-                                                        <td><?= $f["nilai_uts"]; ?></td>
-                                                        <td><?= $f["nilai_uas"]; ?></td>
-                                                        <td><?= $f["nilai_keaktifan"]; ?></td>
-                                                        <td><?= $f["nilai_penghasilan"]; ?></td>
-                                                        <td><?= $f["nilai"]; ?></td>
-                                                        <td>
-                                                            <div class="dropdown">
-                                                                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
-                                                                    Action
-                                                                </button>
-                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                    <li><a class="dropdown-item" href="edit_rule.php?id_rule=<?= $f["id_rule"]; ?>">Edit</a></li>
-                                                                    <li><a class="dropdown-item tombol-hapus" href="delete_rule.php?id_rule=<?= $f["id_rule"]; ?>">Delete</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <?php $n++; ?>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
+                                            <?php foreach ($d_siswa as $siswa) : ?>
                                                 <tr>
-                                                    <td colspan="9" class="text-center">No data found</td>
+                                                    <td><?= $n++; ?></td>
+                                                    <td><?= $siswa["nis"]; ?></td>
+                                                    <td><?= $siswa["nama_siswa"]; ?></td>
+                                                    <td><?= $siswa["alamat"]; ?></td>
+                                                    <td><?= $siswa["tanggal_lahir"]; ?></td>
+                                                    <td><?= $siswa["kelas"]; ?></td>
+                                                    <td><?= $siswa["jenis_kelamin"]; ?></td>
+                                                    <td><?= $siswa["no_telfon"]; ?></td>
+                                                    <td><?= $siswa["email"]; ?></td>
+                                                    <td>
+                                                        <a href="edit_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a>
+                                                        <a href="delete_siswa.php?id_siswa=<?= $siswa["id_siswa"]; ?>" class="tombol-hapus">Delete</a>
+                                                    </td>
                                                 </tr>
-                                            <?php endif; ?>
+                                            <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
+
+                                <!-- Pagination -->
                                 <div class="card-footer clearfix">
                                     <div class="showing-entries">
                                         <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
@@ -164,29 +177,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </div>
                         </div>
                     </div>
-                    <!-- /.row -->
-                </div><!-- /.container-fluid -->
+                </div>
             </div>
-            <!-- /.content -->
         </div>
-        <!-- /.content-wrapper -->
 
-        <!-- Main Footer -->
+        <!-- Footer -->
         <?php require_once '../partials/footer.php' ?>
     </div>
-    <!-- ./wrapper -->
 
-    <!-- REQUIRED SCRIPTS -->
-
-    <!-- jQuery -->
+    <!-- Scripts -->
     <script src="../assets/plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
     <script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
     <script src="../assets/dist/js/adminlte.min.js"></script>
-    <!-- Sweetalert -->
-    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
-    <!-- Custom Pagination Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             $('.tombol-hapus').on('click', function(e) {
@@ -215,7 +218,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         icon: 'success',
                                         showConfirmButton: true,
                                     }).then(() => {
-                                        window.location.href = '../rule_fuzzy';
+                                        window.location.href = '../data_siswa';
                                     });
                                 } else if (res.status === 'error') {
                                     Swal.fire('Error', 'Data Gagal Dihapus', 'error');
@@ -230,16 +233,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     }
                 });
             });
-
+            // Fungsi untuk menangani kueri pencarian
             function handleSearchQuery() {
                 var keyword = $('#keyword').val();
-                $.get('../ajax/rule_fuzzy.php?keyword=' + keyword, function(data) {
+                $.get('../ajax/data_siswa.php?keyword=' + keyword, function(data) {
                     $('#tabel').html(data);
 
+                    // Cek apakah ada data yang ditemukan
                     if (data.trim() === "") {
                         $('#tabel').html('<tr><td colspan="9" class="text-center">No data found</td></tr>');
                         updateShowingEntries(0, 0, 1);
                     } else {
+                        // Initialize ulang tombol-hapus setelah memuat data baru
                         $('.tombol-hapus').on('click', function(e) {
                             e.preventDefault();
                             const href = $(this).attr('href');
@@ -266,7 +271,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                     icon: 'success',
                                                     showConfirmButton: true
                                                 }).then(() => {
-                                                    window.location.href = '../rule_fuzzy';
+                                                    window.location.href = '../data_siswa';
                                                 });
                                             } else if (res.status === 'error') {
                                                 Swal.fire('Error', 'Data Gagal Dihapus', 'error');
@@ -285,6 +290,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 });
             }
 
+            // Fungsi untuk memperbarui tampilan showing entries
             function updateShowingEntries(jumlahData, jumlahDataPerHalaman, halamanSekarang) {
                 if (jumlahData === 0) {
                     $('#showing-entries').html('Showing 0 entries');
@@ -295,20 +301,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }
             }
 
+            // Event ketika tombol cari ditekan
             $('#tombol-cari').on('click', function(e) {
                 e.preventDefault();
-                handleSearchQuery();
+                handleSearchQuery(); // Panggil fungsi untuk menangani kueri pencarian
             });
 
+            // Ubah event keyup menjadi click pada tombol pencarian
             $('#keyword').on('keydown', function(e) {
                 if (e.key === 'Enter') {
-                    e.preventDefault();
-                    $('#tombol-cari').click();
+                    e.preventDefault(); // Mencegah perilaku default tombol Enter
+                    $('#tombol-cari').click(); // Simulasikan klik pada tombol pencari
                 }
             });
 
         });
     </script>
+
 </body>
 
 </html>
