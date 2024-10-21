@@ -500,20 +500,6 @@ function searchSiswa($keyword)
     return query($query);
 }
 
-
-// function searchRules($keyword)
-// {
-//     $query = "SELECT * FROM rule_fuzzy WHERE
-//                 nis LIKE '%$keyword%' OR
-//                 nama_siswa LIKE '%$keyword%' OR
-//                 kelas LIKE '%$keyword%' OR
-//                 email LIKE '%$keyword%' OR
-//                 no_telfon LIKE '%$keyword%'
-//              ";
-//     return query($query);
-// }
-
-
 function generatePagination($jumlahHalaman, $halamanAktif)
 {
     $pagination = '<ul class="pagination justify-content-end">';
@@ -531,4 +517,168 @@ function generatePagination($jumlahHalaman, $halamanAktif)
     $pagination .= '</ul>';
 
     return $pagination;
+}
+
+// Fungsi untuk mengkategorikan nilai ke dalam kategori fuzzy (rendah, sedang, tinggi)
+function categorize($tipe, $nilai)
+{
+    switch ($tipe) {
+        case 'uts':
+        case 'uas':
+            if ($nilai > 80) return 'tinggi';   // Nilai tinggi
+            if ($nilai > 60) return 'sedang';   // Nilai sedang
+            return 'rendah';                     // Nilai rendah
+
+        case 'keaktifan':
+            if ($nilai > 70) return 'tinggi';   // Keaktifan tinggi
+            if ($nilai > 50) return 'sedang';   // Keaktifan sedang
+            return 'rendah';                     // Keaktifan rendah
+
+        case 'penghasilan':
+            if ($nilai < 2000000) return 'rendah';  // Penghasilan rendah
+            if ($nilai < 5000000) return 'sedang';  // Penghasilan sedang
+            return 'tinggi';                         // Penghasilan tinggi
+
+        default:
+            return 'tidak diketahui';
+    }
+}
+
+
+// Fungsi untuk menghitung hasil fuzzy dari input nilai
+function hitungFuzzy($nilai_uts, $nilai_uas, $keaktifan, $penghasilan)
+{
+    // Kategorikan nilai berdasarkan input
+    $kategori_uts = categorize('uts', $nilai_uts);
+    $kategori_uas = categorize('uas', $nilai_uas);
+    $kategori_keaktifan = categorize('keaktifan', $keaktifan);
+    $kategori_penghasilan = categorize('penghasilan', $penghasilan);
+
+    // Query untuk mengambil aturan fuzzy berdasarkan kategori yang telah ditentukan
+    $query = "SELECT * FROM rule_fuzzy
+              WHERE nilai_uts = '$kategori_uts'
+              AND nilai_uas = '$kategori_uas'
+              AND nilai_keaktifan = '$kategori_keaktifan'
+              AND nilai_penghasilan = '$kategori_penghasilan'";
+    $rules = query($query);
+
+    // Jika tidak ada aturan yang cocok, kembalikan hasil default
+    if (!$rules || count($rules) === 0) {
+        return [
+            'nilai' => 0,
+            'keterangan' => 'Tidak Diketahui'
+        ];
+    }
+
+    // Inisialisasi variabel untuk menyimpan hasil perhitungan
+    $total_weighted_output = 0;
+    $total_membership_value = 0;
+
+    // Proses inferensi berdasarkan aturan yang didapat
+    foreach ($rules as $rule) {
+        $output = $rule['nilai'];
+
+        // Dapatkan nilai keanggotaan untuk setiap variabel input
+        $membership_uts = getMembershipValue('uts', $nilai_uts);
+        $membership_uas = getMembershipValue('uas', $nilai_uas);
+        $membership_keaktifan = getMembershipValue('keaktifan', $keaktifan);
+        $membership_penghasilan = getMembershipValue('penghasilan', $penghasilan);
+
+        // Gunakan metode inferensi MIN, yaitu nilai terkecil dari keanggotaan
+        $membership_value = min($membership_uts, $membership_uas, $membership_keaktifan, $membership_penghasilan);
+
+        // Hitung total output berbobot dan total nilai keanggotaan
+        $total_weighted_output += $membership_value * $output;
+        $total_membership_value += $membership_value;
+    }
+
+    // Defuzzification: Hitung nilai akhir sebagai rata-rata berbobot
+    if ($total_membership_value > 0) {
+        $nilai_fuzzy = $total_weighted_output / $total_membership_value;
+        $keterangan = $nilai_fuzzy >= 50 ? 'Layak' : 'Tidak Layak';
+    } else {
+        $nilai_fuzzy = 0;
+        $keterangan = 'Tidak Diketahui';
+    }
+
+    // Return hasil fuzzy dan keterangan kelayakan
+    return [
+        'nilai' => $nilai_fuzzy,
+        'keterangan' => $keterangan
+    ];
+}
+
+// Fungsi untuk mendapatkan nilai keanggotaan (membership value)
+function getMembershipValue($tipe, $nilai)
+{
+    switch ($tipe) {
+        case 'uts':
+        case 'uas':
+            if ($nilai > 80) return 1;       // Keanggotaan penuh untuk kategori 'tinggi'
+            if ($nilai > 60) return 0.5;     // Keanggotaan parsial untuk kategori 'sedang'
+            return 0.1;                       // Keanggotaan rendah untuk kategori 'rendah'
+
+        case 'keaktifan':
+            if ($nilai > 70) return 1;       // Keanggotaan penuh untuk keaktifan tinggi
+            if ($nilai > 50) return 0.5;     // Keanggotaan parsial untuk keaktifan sedang
+            return 0.1;                       // Keanggotaan rendah untuk keaktifan rendah
+
+        case 'penghasilan':
+            if ($nilai < 2000000) return 1;  // Keanggotaan penuh untuk penghasilan rendah
+            if ($nilai < 5000000) return 0.5; // Keanggotaan parsial untuk penghasilan sedang
+            return 0.1;                       // Keanggotaan rendah untuk penghasilan tinggi
+
+        default:
+            return 0;
+    }
+}
+
+function simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $nilai_uas, $keaktifan, $penghasilan, $nilai_fuzzy, $keterangan, $dateReport)
+{
+    global $db;
+    $dateReport = date('Y-m-d', strtotime($dateReport));
+
+    // Escape input untuk menghindari SQL injection
+    $user_id = mysqli_real_escape_string($db, $user_id);
+    $nis = mysqli_real_escape_string($db, $nis);
+    $nama_siswa = mysqli_real_escape_string($db, $nama_siswa);
+    $nilai_uts = mysqli_real_escape_string($db, $nilai_uts);
+    $nilai_uas = mysqli_real_escape_string($db, $nilai_uas);
+    $keaktifan = mysqli_real_escape_string($db, $keaktifan);
+    $penghasilan = mysqli_real_escape_string($db, $penghasilan);
+    $nilai_fuzzy = mysqli_real_escape_string($db, $nilai_fuzzy);
+    $keterangan = mysqli_real_escape_string($db, $keterangan);
+    $dateReport = mysqli_real_escape_string($db, $dateReport);
+
+    $checkQuery = "SELECT * FROM hasil_fuzzy 
+                   WHERE user_id = '$user_id' 
+                   AND nis = '$nis' 
+                   AND nilai_uts = '$nilai_uts' 
+                   AND nilai_uas = '$nilai_uas' 
+                   AND keaktifan = '$keaktifan' 
+                   AND penghasilan = '$penghasilan' 
+                   AND nilai_fuzzy = '$nilai_fuzzy' 
+                   AND keterangan = '$keterangan'";
+
+    $checkResult = mysqli_query($db, $checkQuery);
+
+    // Jika ada data yang sama, tidak perlu menyimpan
+    if (mysqli_num_rows($checkResult) > 0) {
+        return true;
+    }
+
+    // Query SQL untuk menyimpan data
+    $query = "INSERT INTO hasil_fuzzy (user_id, id_siswa, nis, nama_siswa, nilai_uts, nilai_uas, keaktifan, penghasilan, nilai_fuzzy, keterangan, date_report)
+              VALUES ('$user_id', '$id_siswa', '$nis', '$nama_siswa', '$nilai_uts', '$nilai_uas', '$keaktifan', '$penghasilan', '$nilai_fuzzy', '$keterangan', '$dateReport')";
+
+    $result = mysqli_query($db, $query);
+
+    // Cek apakah query berhasil
+    if (!$result) {
+        // Jika gagal, tampilkan pesan error dari MySQL
+        echo "Error saat menyimpan data: " . mysqli_error($db);
+        return false;
+    }
+
+    return true;
 }

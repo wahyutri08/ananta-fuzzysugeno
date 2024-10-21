@@ -95,7 +95,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="examples/invoice.html" class="nav-link <?= ($current_page == 'hasil_analisa') ? 'active' : '' ?>">
+                            <a href="../keputusan" class="nav-link <?= ($current_page == 'hasil_analisa') ? 'active' : '' ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Hasil Analisa</p>
                             </a>
@@ -106,7 +106,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                 <!-- Laporan Hasil Analisa -->
                 <li class="nav-header">LAPORAN</li>
                 <li class="nav-item">
-                    <a href="../dashboard" class="nav-link <?= ($current_page == 'laporan_analisa') ? 'active' : '' ?>">
+                    <a href="../hasil_fuzzy" class="nav-link <?= ($current_page == 'laporan_analisa') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-file-invoice"></i>
                         <p>Laporan Hasil Analisa</p>
                     </a>
