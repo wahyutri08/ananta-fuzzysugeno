@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 15, 2024 at 10:03 PM
+-- Generation Time: Oct 21, 2024 at 09:37 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -24,11 +24,40 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `hasil_fuzzy`
+--
+
+CREATE TABLE `hasil_fuzzy` (
+  `id_hasil` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `id_siswa` int(11) DEFAULT NULL,
+  `nis` varchar(250) NOT NULL,
+  `nama_siswa` varchar(250) NOT NULL,
+  `nilai_uts` varchar(250) NOT NULL,
+  `nilai_uas` varchar(250) NOT NULL,
+  `keaktifan` varchar(250) NOT NULL,
+  `penghasilan` varchar(250) NOT NULL,
+  `nilai_fuzzy` varchar(250) NOT NULL,
+  `keterangan` varchar(250) NOT NULL,
+  `date_report` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `hasil_fuzzy`
+--
+
+INSERT INTO `hasil_fuzzy` (`id_hasil`, `user_id`, `id_siswa`, `nis`, `nama_siswa`, `nilai_uts`, `nilai_uas`, `keaktifan`, `penghasilan`, `nilai_fuzzy`, `keterangan`, `date_report`) VALUES
+(255, 13, 32, '1001', 'Ahmad Rizki Hidayat', '90', '50', '90', '2000000', '80', 'Layak', '2024-10-21');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `penilaian`
 --
 
 CREATE TABLE `penilaian` (
   `id_penilaian` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `id_siswa` int(11) NOT NULL,
   `id_variabel` int(11) NOT NULL,
   `nilai` float NOT NULL
@@ -38,15 +67,11 @@ CREATE TABLE `penilaian` (
 -- Dumping data for table `penilaian`
 --
 
-INSERT INTO `penilaian` (`id_penilaian`, `id_siswa`, `id_variabel`, `nilai`) VALUES
-(63, 2, 1, 80),
-(64, 2, 2, 85),
-(65, 2, 3, 90),
-(66, 2, 4, 50000000),
-(67, 3, 1, 43),
-(68, 3, 2, 23),
-(69, 3, 3, 78),
-(70, 3, 4, 500000);
+INSERT INTO `penilaian` (`id_penilaian`, `user_id`, `id_siswa`, `id_variabel`, `nilai`) VALUES
+(183, 13, 32, 1, 90),
+(184, 13, 32, 2, 50),
+(185, 13, 32, 3, 90),
+(186, 13, 32, 4, 2000000);
 
 -- --------------------------------------------------------
 
@@ -56,21 +81,29 @@ INSERT INTO `penilaian` (`id_penilaian`, `id_siswa`, `id_variabel`, `nilai`) VAL
 
 CREATE TABLE `rule_fuzzy` (
   `id_rule` int(11) NOT NULL,
-  `nilai_uts` varchar(250) NOT NULL,
-  `nilai_uas` varchar(250) NOT NULL,
-  `nilai_keaktifan` varchar(250) NOT NULL,
-  `nilai_penghasilan` varchar(250) NOT NULL,
-  `nilai` float NOT NULL
+  `nilai_uts` enum('Rendah','Sedang','Tinggi') NOT NULL,
+  `nilai_uas` enum('Rendah','Sedang','Tinggi') NOT NULL,
+  `nilai_keaktifan` enum('Rendah','Sedang','Tinggi') NOT NULL,
+  `nilai_penghasilan` enum('Rendah','Sedang','Tinggi') NOT NULL,
+  `nilai` float NOT NULL,
+  `keterangan` enum('Layak','Tidak Layak') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `rule_fuzzy`
 --
 
-INSERT INTO `rule_fuzzy` (`id_rule`, `nilai_uts`, `nilai_uas`, `nilai_keaktifan`, `nilai_penghasilan`, `nilai`) VALUES
-(1, 'Tinggi', 'Tinggi', 'Tinggi', 'Rendah', 1),
-(2, 'Rendah', 'Rendah', 'Rendah', 'Rendah', 0),
-(3, 'Sedang', 'Sedang', 'Tinggi', 'Sedang', 1);
+INSERT INTO `rule_fuzzy` (`id_rule`, `nilai_uts`, `nilai_uas`, `nilai_keaktifan`, `nilai_penghasilan`, `nilai`, `keterangan`) VALUES
+(7, 'Tinggi', 'Tinggi', 'Tinggi', 'Rendah', 100, 'Layak'),
+(8, 'Rendah', 'Rendah', 'Rendah', 'Tinggi', 50, 'Tidak Layak'),
+(9, 'Sedang', 'Sedang', 'Tinggi', 'Sedang', 75, 'Layak'),
+(10, 'Sedang', 'Tinggi', 'Sedang', 'Sedang', 85, 'Layak'),
+(11, 'Tinggi', 'Sedang', 'Rendah', 'Rendah', 70, 'Layak'),
+(12, 'Rendah', 'Sedang', 'Rendah', 'Tinggi', 50, 'Tidak Layak'),
+(13, 'Tinggi', 'Rendah', 'Tinggi', 'Sedang', 80, 'Layak'),
+(14, 'Sedang', 'Rendah', 'Sedang', 'Rendah', 65, 'Layak'),
+(15, 'Rendah', 'Rendah', 'Tinggi', 'Tinggi', 50, 'Tidak Layak'),
+(16, 'Sedang', 'Tinggi', 'Rendah', 'Rendah', 70, 'Layak');
 
 -- --------------------------------------------------------
 
@@ -80,6 +113,7 @@ INSERT INTO `rule_fuzzy` (`id_rule`, `nilai_uts`, `nilai_uas`, `nilai_keaktifan`
 
 CREATE TABLE `siswa` (
   `id_siswa` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `nis` varchar(250) NOT NULL,
   `nama_siswa` varchar(250) NOT NULL,
   `alamat` varchar(250) NOT NULL,
@@ -94,9 +128,26 @@ CREATE TABLE `siswa` (
 -- Dumping data for table `siswa`
 --
 
-INSERT INTO `siswa` (`id_siswa`, `nis`, `nama_siswa`, `alamat`, `tanggal_lahir`, `kelas`, `jenis_kelamin`, `no_telfon`, `email`) VALUES
-(2, '181011450', 'Ahmad Rizki Hidayat', 'JL Satu Arah', '2000-01-01', '12A', 'Laki-Laki', '089777718192', 'ahmad@email.com'),
-(3, '181011451', 'Arfan Jumelar Subangkit', 'Jl Dua Arah', '2000-01-02', '12A', 'Laki-Laki', '08961237817272', 'arfan@email.com');
+INSERT INTO `siswa` (`id_siswa`, `user_id`, `nis`, `nama_siswa`, `alamat`, `tanggal_lahir`, `kelas`, `jenis_kelamin`, `no_telfon`, `email`) VALUES
+(32, 13, '1001', 'Ahmad Rizki Hidayat', 'JL Satu Arah', '2024-10-02', '12A', 'Laki-Laki', '09090909', 'tester@tester.com');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff`
+--
+
+CREATE TABLE `staff` (
+  `id_staff` int(11) NOT NULL,
+  `username` varchar(250) NOT NULL,
+  `email` varchar(250) NOT NULL,
+  `password` varchar(250) NOT NULL,
+  `role` varchar(250) NOT NULL,
+  `alamat` varchar(250) NOT NULL,
+  `no_telefon` varchar(250) NOT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL,
+  `avatar` varchar(250) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -110,7 +161,8 @@ CREATE TABLE `users` (
   `email` varchar(250) NOT NULL,
   `nama` varchar(250) NOT NULL,
   `password` varchar(250) NOT NULL,
-  `role` varchar(250) NOT NULL,
+  `role` enum('Admin','Staff') NOT NULL,
+  `status` enum('Aktif','Tidak Aktif') NOT NULL,
   `avatar` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -118,9 +170,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `nama`, `password`, `role`, `avatar`) VALUES
-(3, 'ananta.dicapriyo', 'ananta@admin.com', 'Ananta Dicapriyo', '$2y$10$VBIj.EPBimoZyMWbtH8SiOfa7Euo6QI4nsKgXHdznTvAuuP.Inv/O', 'Admin', '670ea54b5b1b0.jpg'),
-(13, 'staff1', 'staff@staff.com', 'Staff 1', '$2y$10$naciDpF2kGzM/5fCMohA3e2cAd0PT2zTigyqIF18tyXO4naDyZLtq', 'Staff', '670047c89172d.');
+INSERT INTO `users` (`id`, `username`, `email`, `nama`, `password`, `role`, `status`, `avatar`) VALUES
+(3, 'ananta.dicapriyo', 'ananta@admin.com', 'Ananta Dicapriyo', '$2y$10$VBIj.EPBimoZyMWbtH8SiOfa7Euo6QI4nsKgXHdznTvAuuP.Inv/O', 'Admin', 'Aktif', '6712aef472d5f.jpg'),
+(13, 'ananta1', 'staff@staff.com', 'Ananta', '$2y$10$JAAEmdRqckSLES2e0GtGS.tiV0dftYHqqHyOrI/lY02QVyjIAvFcS', 'Staff', 'Aktif', '6710e8ea86177.jpg');
 
 -- --------------------------------------------------------
 
@@ -151,25 +203,41 @@ INSERT INTO `variabel` (`id_variabel`, `nama_variabel`, `kat_rendah`, `kat_sedan
 --
 
 --
+-- Indexes for table `hasil_fuzzy`
+--
+ALTER TABLE `hasil_fuzzy`
+  ADD PRIMARY KEY (`id_hasil`),
+  ADD KEY `fk_hasil_user` (`user_id`),
+  ADD KEY `fk_hasil_siswa` (`id_siswa`);
+
+--
 -- Indexes for table `penilaian`
 --
 ALTER TABLE `penilaian`
   ADD PRIMARY KEY (`id_penilaian`),
   ADD KEY `fk_siswa` (`id_siswa`),
-  ADD KEY `fk_variabel` (`id_variabel`);
+  ADD KEY `fk_variabel` (`id_variabel`),
+  ADD KEY `fk_user_nilai` (`user_id`);
 
 --
 -- Indexes for table `rule_fuzzy`
 --
 ALTER TABLE `rule_fuzzy`
   ADD PRIMARY KEY (`id_rule`),
-  ADD UNIQUE KEY `nilai_uts` (`nilai_uts`,`nilai_uas`,`nilai_keaktifan`,`nilai_penghasilan`) USING HASH;
+  ADD UNIQUE KEY `nilai_uts` (`nilai_uts`,`nilai_uas`,`nilai_keaktifan`,`nilai_penghasilan`);
 
 --
 -- Indexes for table `siswa`
 --
 ALTER TABLE `siswa`
-  ADD PRIMARY KEY (`id_siswa`);
+  ADD PRIMARY KEY (`id_siswa`),
+  ADD KEY `fk_user` (`user_id`);
+
+--
+-- Indexes for table `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`id_staff`);
 
 --
 -- Indexes for table `users`
@@ -188,28 +256,40 @@ ALTER TABLE `variabel`
 --
 
 --
+-- AUTO_INCREMENT for table `hasil_fuzzy`
+--
+ALTER TABLE `hasil_fuzzy`
+  MODIFY `id_hasil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+
+--
 -- AUTO_INCREMENT for table `penilaian`
 --
 ALTER TABLE `penilaian`
-  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191;
 
 --
 -- AUTO_INCREMENT for table `rule_fuzzy`
 --
 ALTER TABLE `rule_fuzzy`
-  MODIFY `id_rule` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_rule` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `siswa`
 --
 ALTER TABLE `siswa`
-  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `staff`
+--
+ALTER TABLE `staff`
+  MODIFY `id_staff` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `variabel`
@@ -222,11 +302,25 @@ ALTER TABLE `variabel`
 --
 
 --
+-- Constraints for table `hasil_fuzzy`
+--
+ALTER TABLE `hasil_fuzzy`
+  ADD CONSTRAINT `fk_hasil_siswa` FOREIGN KEY (`id_siswa`) REFERENCES `siswa` (`id_siswa`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_hasil_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `penilaian`
 --
 ALTER TABLE `penilaian`
   ADD CONSTRAINT `fk_siswa` FOREIGN KEY (`id_siswa`) REFERENCES `siswa` (`id_siswa`),
+  ADD CONSTRAINT `fk_user_nilai` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `fk_variabel` FOREIGN KEY (`id_variabel`) REFERENCES `variabel` (`id_variabel`);
+
+--
+-- Constraints for table `siswa`
+--
+ALTER TABLE `siswa`
+  ADD CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
