@@ -611,3 +611,43 @@ function generatePagination($jumlahHalaman, $halamanAktif)
 
     return $pagination;
 }
+
+
+// $users = query("SELECT * FROM users");
+// $siswa = query("SELECT * FROM siswa");
+
+// $user_id = $_SESSION['id'];
+// $role = $_SESSION['role'];
+// $date_report = $_GET['date_report'] ?? ''; // Filter berdasarkan tanggal
+// $user_id = $_GET['user_id'] ?? '';       // Filter berdasarkan staff
+// $nis_siswa = $_GET['nis'] ?? '';
+// $keterangan = $_GET['keterangan'] ?? '';           // Filter berdasarkan status
+
+// // Query dasar
+// $query = "SELECT hf.*, u.nama AS nama_user, s.nis, s.nama_siswa 
+//           FROM hasil_fuzzy hf
+//           JOIN users u ON hf.user_id = u.id
+//           JOIN siswa s ON hf.nis = s.nis
+//           WHERE 1=1";
+
+// // Filter berdasarkan tanggal
+// if (!empty($date_report)) {
+//     $query .= " AND DATE(hf.date_report) = '$date_report'";
+// }
+
+// // Filter berdasarkan staff jika ada pilihan tertentu
+// if (!empty($user_id) && $user_id !== 'all') {
+//     $query .= " AND hf.user_id = '$user_id'";
+// }
+
+// // Filter berdasarkan staff jika ada pilihan tertentu
+// if (!empty($nis_siswa) && $nis_siswa !== 'all') {
+//     $query .= " AND hf.nis = '$nis_siswa'";
+// }
+
+// // Filter berdasarkan status beasiswa jika ada pilihan tertentu
+// if (!empty($keterangan) && $keterangan !== 'all') {
+//     $query .= " AND hf.keterangan = '$keterangan'";
+// }
+
+// $result = query($query);

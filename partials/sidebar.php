@@ -3,9 +3,11 @@
 $current_page = basename($_SERVER['REQUEST_URI']);
 
 // Halaman-halaman yang berada di dalam Master Data
-$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian'];
+$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian',];
+$keputusan = ['hasil_analisa'];
 $settings_page = ['profile', 'change_password'];
 $id = $_SESSION["id"];
+$role = $_SESSION["role"];
 $user = query("SELECT * FROM users WHERE id = $id")[0];
 ?>
 
@@ -85,8 +87,8 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
 
                 <!-- Proses Beasiswa -->
                 <!-- <li class="nav-header">PROSES</li> -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
+                <li class="nav-item <?= (in_array($current_page, $keputusan)) ? 'menu-open' : '' ?>">
+                    <a href="#" class="nav-link <?= (in_array($current_page, $keputusan)) ? 'active' : '' ?>">
                         <i class="nav-icon fa-solid fa-gears"></i>
                         <p>
                             Keputusan
@@ -95,9 +97,9 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="../keputusan" class="nav-link <?= ($current_page == 'hasil_analisa') ? 'active' : '' ?>">
+                            <a href="../hasil_analisa" class="nav-link <?= ($current_page == 'hasil_analisa') ? 'active' : '' ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Hasil Analisa</p>
+                                <p>Proses</p>
                             </a>
                         </li>
                     </ul>

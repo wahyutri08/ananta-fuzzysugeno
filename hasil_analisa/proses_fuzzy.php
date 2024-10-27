@@ -59,6 +59,7 @@ foreach ($d_siswa as $siswa) {
     $keterangan = $hasil_fuzzy['keterangan'];
 
     // Simpan hasil fuzzy ke database
+    date_default_timezone_set('Asia/Jakarta');
     $simpan = simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $nilai_uas, $keaktifan, $penghasilan, $nilai_fuzzy, $keterangan, date('Y-m-d'));
 
     // Cek apakah penyimpanan berhasil

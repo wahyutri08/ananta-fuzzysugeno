@@ -31,28 +31,28 @@ $jumlahData = $resultTotal[0]['jumlah'];
 // Menghitung jumlah halaman
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
-// // Mendefinisikan tautan pagination
-// $pagination = '<div class="card-footer clearfix">';
-// $pagination .= '<ul class="pagination pagination-sm m-0 float-right">';
-// $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . max(1, $page - 1) . '">Previous</a></li>';
+// Mendefinisikan tautan pagination
+$pagination = '<div class="card-footer clearfix">';
+$pagination .= '<ul class="pagination pagination-sm m-0 float-right">';
+$pagination .= '<li class="page-item"><a class="page-link" href="?page=' . max(1, $page - 1) . '">Previous</a></li>';
 
-// $jumlahTampil = min(5, $jumlahHalaman);
-// $start = max(1, min($page - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
-// $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
+$jumlahTampil = min(5, $jumlahHalaman);
+$start = max(1, min($page - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
+$end = min($start + $jumlahTampil - 1, $jumlahHalaman);
 
-// for ($i = $start; $i <= $end; $i++) {
-//     if ($i == $page) {
-//         $pagination .= '<li class="page-item active"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-//     } else {
-//         $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-//     }
-// }
-// $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . min($jumlahHalaman, $page + 1) . '">Next</a></li>';
-// $pagination .= '</ul>';
+for ($i = $start; $i <= $end; $i++) {
+    if ($i == $page) {
+        $pagination .= '<li class="page-item active"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+    } else {
+        $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+    }
+}
+$pagination .= '<li class="page-item"><a class="page-link" href="?page=' . min($jumlahHalaman, $page + 1) . '">Next</a></li>';
+$pagination .= '</ul>';
 
-// // Jika ada data, tampilkan informasi showing-entries
-// $pagination .= '<span id="showing-entries">Showing ' . ($awalData + 1) . ' to ' . min($awalData + $jumlahDataPerHalaman, $jumlahData) . ' of ' . $jumlahData . ' entries</span>';
-// $pagination .= '</div>';
+// Jika ada data, tampilkan informasi showing-entries
+$pagination .= '<span id="showing-entries">Showing ' . ($awalData + 1) . ' to ' . min($awalData + $jumlahDataPerHalaman, $jumlahData) . ' of ' . $jumlahData . ' entries</span>';
+$pagination .= '</div>';
 
 ?>
 

@@ -1,0 +1,5 @@
+# Menonaktifkan directory listing
+Options -Indexes
+
+# Mengaktifkan URL Rewrite
+RewriteEngine On

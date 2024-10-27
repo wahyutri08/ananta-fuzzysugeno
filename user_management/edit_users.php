@@ -11,7 +11,18 @@ if ($_SESSION['role'] !== 'Admin') {
     exit;
 }
 
-$id = $_GET["id"];
+if (isset($_GET["id"])) {
+    $id = $_GET["id"];
+} else {
+    header("Location: ../error/error.php?message=ID Users tidak ditemukan");
+    exit;
+}
+
+if ($id === null) {
+    header("Location: ../error/error.php?message=ID Users tidak ditemukan");
+    exit;
+}
+
 $users = query("SELECT * FROM users WHERE id = $id")[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -46,6 +57,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode(["status" => "error", "message" => "Data Gagal Diubah"]);
         }
     }
+    exit;
+}
+
+if (empty($users)) {
+    header("Location: ../error/error.php?message=ID Users tidak valid");
     exit;
 }
 
