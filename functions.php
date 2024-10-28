@@ -683,3 +683,10 @@ function simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $n
 
     return true;
 }
+
+function deleteHasil($id_hasil)
+{
+    global $db;
+    mysqli_query($db, "DELETE FROM hasil_fuzzy WHERE id_hasil = $id_hasil");
+    return mysqli_affected_rows($db);
+}

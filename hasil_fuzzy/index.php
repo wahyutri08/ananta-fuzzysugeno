@@ -148,21 +148,23 @@ $siswa = query("SELECT * FROM siswa");
                                                 <label for="tanggal_lahir">Tanggal Laporan Hasil:</label>
                                                 <input type="date" class="form-control" name="date_report" id="date_report" value="<?= htmlspecialchars($date_report); ?>">
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label>Staff:</label>
-                                                <select class="select2" name="user_id" style="width: 100%;">
-                                                    <option value="all">-All Staff-</option>
-                                                    <?php foreach ($users as $user) : ?>
-                                                        <option value="<?= $user['id']; ?>" <?= $filter_user_id == $user['id'] ? 'selected' : ''; ?>><?= $user['nama']; ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
+                                            <?php if ($role == 'Admin'): ?>
+                                                <div class="form-group col-md-3">
+                                                    <label>Staff:</label>
+                                                    <select class="select2" name="user_id" style="width: 100%;">
+                                                        <option value="all">-All Staff-</option>
+                                                        <?php foreach ($users as $user) : ?>
+                                                            <option value="<?= $user['id']; ?>" <?= $filter_user_id == $user['id'] ? 'selected' : ''; ?>><?= $user['nama']; ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            <?php endif; ?>
                                             <div class="form-group col-md-3">
                                                 <label>NIS Siswa:</label>
                                                 <select class="select2" name="nis" style="width: 100%;">
                                                     <option value="all">-All Siswa-</option>
                                                     <?php foreach ($siswa as $s) : ?>
-                                                        <option value="<?= $s['nis']; ?>" <?= $nis_siswa == $s['nis'] ? 'selected' : ''; ?>><?= $s['nis']; ?> | <?= $s['nama_siswa']; ?></option>
+                                                        <option value="<?= $s['nis']; ?>" <?= $nis_siswa == $s['nis'] ? 'selected' : ''; ?>>(<?= $s['nis']; ?>) <?= $s['nama_siswa']; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -179,6 +181,9 @@ $siswa = query("SELECT * FROM siswa");
                                             <div class="form-group col-md-3">
                                                 <button type="submit" class="btn btn-sm btn-warning">
                                                     <i class="fa fa-search"></i> Search
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger ml-1" onclick="window.location.href='cetak.php?date_report=<?= $date_report; ?>&user_id=<?= $filter_user_id; ?>&nis=<?= $nis_siswa; ?>&keterangan=<?= $keterangan; ?>'">
+                                                    <i class="fa fa-file-pdf"></i> Cetak
                                                 </button>
                                             </div>
                                         </div>
@@ -199,7 +204,6 @@ $siswa = query("SELECT * FROM siswa");
                                                 <th>NIS</th>
                                                 <th>Nama Siswa</th>
                                                 <th>Status Beasiswa</th>
-                                                <th>Tanggal</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -211,15 +215,18 @@ $siswa = query("SELECT * FROM siswa");
                                                         <td><?= htmlspecialchars($row['nis']); ?></td>
                                                         <td><?= htmlspecialchars($row['nama_siswa']); ?></td>
                                                         <td><?= htmlspecialchars($row['keterangan']); ?></td>
-                                                        <td><?= htmlspecialchars($row['date_report']); ?></td>
                                                         <td>
                                                             <div class="dropdown">
                                                                 <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
                                                                     Action
                                                                 </button>
                                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                    <li><a class="dropdown-item" href="edit_siswa.php?id_siswa=<?= $s["id_siswa"]; ?>">Edit</a></li>
-                                                                    <li><a class="dropdown-item tombol-hapus" href="delete_siswa.php?id_siswa=<?= $s["id_siswa"]; ?>">Delete</a></li>
+                                                                    <li><a class="dropdown-item" href="cetak_hasil.php?id_siswa=<?= $s["id_siswa"]; ?>">Cetak</a></li>
+                                                                    <?php
+                                                                    if ($role == 'Admin') {
+                                                                        echo '<li><a class="dropdown-item tombol-hapus" href="delete_hasil.php?id_hasil=' . $row['id_hasil'] . '">Delete</a></li>';
+                                                                    }
+                                                                    ?>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -262,6 +269,67 @@ $siswa = query("SELECT * FROM siswa");
     <script src="../assets/plugins/select2/js/select2.full.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/dist/js/adminlte.min.js"></script>
+    <!-- Sweetalert -->
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.tombol-hapus').on('click', function(e) {
+                e.preventDefault();
+                const href = $(this).attr('href');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Data Akan Dihapus",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            url: href,
+                            type: 'GET',
+                            success: function(response) {
+                                let res = JSON.parse(response);
+                                if (res.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Deleted!',
+                                        text: 'Data Berhasil Dihapus',
+                                        icon: 'success',
+                                        showConfirmButton: true,
+                                    }).then(() => {
+                                        window.location.href = '../hasil_fuzzy';
+                                    });
+                                } else if (res.status === 'error') {
+                                    Swal.fire('Error', 'Data Gagal Dihapus', 'error');
+                                } else if (res.status === 'redirect') {
+                                    window.location.href = '../login';
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+            function updateShowingEntries(jumlahData, jumlahDataPerHalaman, halamanSekarang) {
+                if (jumlahData === 0) {
+                    $('#showing-entries').html('Showing 0 entries');
+                } else {
+                    var startEntry = (halamanSekarang - 1) * jumlahDataPerHalaman + 1;
+                    var endEntry = Math.min(halamanSekarang * jumlahDataPerHalaman, jumlahData);
+                    $('#showing-entries').html('Showing ' + startEntry + ' to ' + endEntry + ' of ' + jumlahData + ' entries');
+                }
+            }
+
+            $('#tombol-cari').on('click', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
     <script>
         $(function() {
             $('.select2').select2()
@@ -276,6 +344,7 @@ $siswa = query("SELECT * FROM siswa");
             document.getElementById('date_report').value = formattedDate;
         });
     </script>
+
 </body>
 
 </html>

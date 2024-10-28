@@ -14,19 +14,19 @@ if ($_SESSION['role'] !== 'Admin') {
 if (isset($_GET["id_rule"])) {
     $id_rule = $_GET["id_rule"];
 } else {
-    header("Location: ../error.php?message=ID Rule tidak ditemukan");
+    header("Location: ../error/error.php?message=ID Rule tidak ditemukan");
     exit;
 }
 
 if ($id_rule === null) {
-    header("Location: ../error.php?message=ID Rule tidak ditemukan");
+    header("Location: ../error/error.php?message=ID Rule tidak ditemukan");
     exit;
 }
 
 $rule_fuzzy = query("SELECT * FROM rule_fuzzy WHERE id_rule = $id_rule")[0];
 
 if (empty($rule_fuzzy)) {
-    header("Location: ../error.php?message=ID Rule tidak valid");
+    header("Location: ../error/error.php?message=ID Rule tidak valid");
     exit;
 }
 

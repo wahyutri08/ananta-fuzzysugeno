@@ -91,7 +91,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
-                                    <h3 class="card-title"><a href="proses_fuzzy.php" class="btn btn-sm btn-block bg-gradient-warning"><i class="fas fa-gears"></i> PROSES FUZZY</a></h3>
+                                    <h3 class="card-title"><a href="proses_fuzzy.php" class="btn btn-sm btn-block bg-gradient-warning" id="proses"><i class="fas fa-gears"></i> PROSES FUZZY</a></h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body table-responsive p-0" id="tabel">
@@ -173,6 +173,75 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="../assets/dist/js/adminlte.min.js"></script>
     <!-- Sweetalert -->
     <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <!-- <script>
+        $(document).ready(function() {
+            $('#proses').on('click', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: 'proses_fuzzy.php',
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        const res = JSON.parse(response);
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                title: "Success",
+                                text: res.message,
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = '../hasil_analisa';
+                            });
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                    }
+                });
+            });
+        });
+    </script> -->
+    <script>
+        $(document).ready(function() {
+            $('#proses').on('click', function(e) {
+                e.preventDefault(); // Hindari pengalihan halaman
+
+                $.ajax({
+                    url: 'proses_fuzzy.php', // URL tujuan
+                    method: 'POST', // Metode pengiriman data (POST)
+                    success: function(response) {
+                        // let res;
+                        try {
+                            res = JSON.parse(response); // Coba parsing response JSON
+                        } catch (e) {
+                            Swal.fire('Error', 'Response bukan dalam format JSON.', 'error');
+                            return;
+                        }
+
+                        if (res.status === 'success') {
+                            Swal.fire({
+                                title: "Success",
+                                text: res.message,
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = '../hasil_analisa'; // Pengalihan setelah sukses
+                            });
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>

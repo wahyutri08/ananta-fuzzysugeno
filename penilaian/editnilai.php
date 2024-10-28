@@ -12,12 +12,12 @@ $role = $_SESSION['role'];
 if (isset($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {
-    header("Location: ../error.php?message=ID Siswa tidak ditemukan");
+    header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
     exit;
 }
 
 if ($id_siswa === null) {
-    header("Location: ../error.php?message=ID Siswa tidak ditemukan");
+    header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
     exit;
 }
 
@@ -30,7 +30,7 @@ if ($role == 'Admin') {
 $variabel = query("SELECT * FROM variabel");
 
 if (empty($siswa)) {
-    header("Location: ../error.php?message=ID Siswa tidak valid");
+    header("Location: ../error/error.php?message=ID Siswa tidak valid");
     exit;
 }
 $siswa = $siswa[0];

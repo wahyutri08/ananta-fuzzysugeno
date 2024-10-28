@@ -62,13 +62,15 @@ foreach ($d_siswa as $siswa) {
     date_default_timezone_set('Asia/Jakarta');
     $simpan = simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $nilai_uas, $keaktifan, $penghasilan, $nilai_fuzzy, $keterangan, date('Y-m-d'));
 
+    echo json_encode(["status" => "success", "message" => "Proses Berhasil"]);
     // Cek apakah penyimpanan berhasil
     if (!$simpan) {
-        echo "Gagal menyimpan hasil untuk siswa dengan NIS: $nis";
+        echo json_encode(["status" => "error", "message" => "Gagal menyimpan hasil untuk siswa dengan NIS: $nis"]);
         exit;
     }
 }
-
-// Redirect kembali setelah proses selesai
-header("Location: ../hasil_fuzzy");
+echo json_encode(["status" => "success", "message" => "Semua data berhasil diproses dan disimpan"]);
 exit;
+// Redirect kembali setelah proses selesai
+// header("Location: ../hasil_fuzzy");
+// exit;

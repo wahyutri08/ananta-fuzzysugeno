@@ -33,9 +33,8 @@ if ($role == 'Admin') {
 if (isset($_POST["search"])) {
     $keyword = $_POST["keyword"];
     if ($role == 'Admin') {
-        $d_siswa = searchSiswa($keyword);  // Admin bisa mencari semua data
+        $d_siswa = searchSiswa($keyword);
     } elseif ($role == 'Staff') {
-        // Staff hanya bisa mencari data yang terkait dengan dirinya
         $d_siswa = searchSiswa($keyword, $user_id);
     }
 }
