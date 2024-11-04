@@ -295,60 +295,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 });
             });
 
-            function handleSearchQuery() {
-                var keyword = $('#keyword').val();
-                $.get('../ajax/data_siswa.php?keyword=' + keyword, function(data) {
-                    $('#tabel').html(data);
-
-                    if (data.trim() === "") {
-                        $('#tabel').html('<tr><td colspan="9" class="text-center">No data found</td></tr>');
-                        updateShowingEntries(0, 0, 1);
-                    } else {
-                        $('.tombol-hapus').on('click', function(e) {
-                            e.preventDefault();
-                            const href = $(this).attr('href');
-
-                            Swal.fire({
-                                title: 'Are you sure?',
-                                text: "Data Akan Dihapus",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33',
-                                confirmButtonText: 'Yes, delete it!'
-                            }).then((result) => {
-                                if (result.value) {
-                                    $.ajax({
-                                        url: href,
-                                        type: 'GET',
-                                        success: function(response) {
-                                            let res = JSON.parse(response);
-                                            if (res.status === 'success') {
-                                                Swal.fire({
-                                                    title: 'Deleted!',
-                                                    text: 'Data Berhasil Dihapus',
-                                                    icon: 'success',
-                                                    showConfirmButton: true
-                                                }).then(() => {
-                                                    window.location.href = '../data_siswa';
-                                                });
-                                            } else if (res.status === 'error') {
-                                                Swal.fire('Error', 'Data Gagal Dihapus', 'error');
-                                            } else if (res.status === 'redirect') {
-                                                window.location.href = '../login';
-                                            }
-                                        },
-                                        error: function() {
-                                            Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
-                                        }
-                                    });
-                                }
-                            });
-                        });
-                    }
-                });
-            }
-
             function updateShowingEntries(jumlahData, jumlahDataPerHalaman, halamanSekarang) {
                 if (jumlahData === 0) {
                     $('#showing-entries').html('Showing 0 entries');
@@ -358,16 +304,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     $('#showing-entries').html('Showing ' + startEntry + ' to ' + endEntry + ' of ' + jumlahData + ' entries');
                 }
             }
-
-            $('#tombol-cari').on('click', function(e) {
-                e.preventDefault();
-                handleSearchQuery();
-            });
-
             $('#keyword').on('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    $('#tombol-cari').click();
                 }
             });
         });

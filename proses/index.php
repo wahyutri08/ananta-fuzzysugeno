@@ -173,65 +173,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="../assets/dist/js/adminlte.min.js"></script>
     <!-- Sweetalert -->
     <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
-    <!-- <script>
+    <script>
         $(document).ready(function() {
             $('#proses').on('click', function(e) {
                 e.preventDefault();
 
                 $.ajax({
                     url: 'proses_fuzzy.php',
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
+                    method: 'POST',
                     success: function(response) {
-                        const res = JSON.parse(response);
-                        if (res.status === 'success') {
+                        response = JSON.parse(response);
+                        if (response.status === 'success') {
                             Swal.fire({
                                 title: "Success",
-                                text: res.message,
+                                text: response.message,
                                 icon: "success"
                             }).then(() => {
-                                window.location.href = '../hasil_analisa';
+                                window.location.href = '../hasil_fuzzy';
                             });
                         } else {
-                            Swal.fire('Error', res.message, 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
-                    }
-                });
-            });
-        });
-    </script> -->
-    <script>
-        $(document).ready(function() {
-            $('#proses').on('click', function(e) {
-                e.preventDefault(); // Hindari pengalihan halaman
-
-                $.ajax({
-                    url: 'proses_fuzzy.php', // URL tujuan
-                    method: 'POST', // Metode pengiriman data (POST)
-                    success: function(response) {
-                        // let res;
-                        try {
-                            res = JSON.parse(response); // Coba parsing response JSON
-                        } catch (e) {
-                            Swal.fire('Error', 'Response bukan dalam format JSON.', 'error');
-                            return;
-                        }
-
-                        if (res.status === 'success') {
-                            Swal.fire({
-                                title: "Success",
-                                text: res.message,
-                                icon: "success"
-                            }).then(() => {
-                                window.location.href = '../hasil_analisa'; // Pengalihan setelah sukses
-                            });
-                        } else {
-                            Swal.fire('Error', res.message, 'error');
+                            Swal.fire('Error', response.message, 'error');
                         }
                     },
                     error: function() {
@@ -241,7 +202,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
         });
     </script>
-
 </body>
 
 </html>

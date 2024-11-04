@@ -12,7 +12,7 @@ $jumlahDataPerHalaman = 10;
 $user_id = $_SESSION['id'];
 $role = $_SESSION['role'];
 $date_report = $_GET['date_report'] ?? '';
-$filter_user_id = $_GET['user_id'] ?? ''; // Menggunakan variabel terpisah untuk filter berdasarkan URL
+$filter_user_id = $_GET['user_id'] ?? '';
 $nis_siswa = $_GET['nis'] ?? '';
 $keterangan = $_GET['keterangan'] ?? '';
 
@@ -137,7 +137,7 @@ $siswa = query("SELECT * FROM siswa");
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col">
-                            <div class="card card-primary">
+                            <div class="card card-danger">
                                 <div class="card-header">
                                     <h3 class="card-title">Filter Search</h3>
                                 </div>
@@ -179,10 +179,10 @@ $siswa = query("SELECT * FROM siswa");
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group col-md-3">
-                                                <button type="submit" class="btn btn-sm btn-warning">
+                                                <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="fa fa-search"></i> Search
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger ml-1" onclick="window.location.href='cetak.php?date_report=<?= $date_report; ?>&user_id=<?= $filter_user_id; ?>&nis=<?= $nis_siswa; ?>&keterangan=<?= $keterangan; ?>'">
+                                                <button type="button" class="btn btn-sm btn-primary ml-1" onclick="window.location.href='cetak.php?date_report=<?= $date_report; ?>&user_id=<?= $filter_user_id; ?>&nis=<?= $nis_siswa; ?>&keterangan=<?= $keterangan; ?>'">
                                                     <i class="fa fa-file-pdf"></i> Cetak
                                                 </button>
                                             </div>
@@ -194,13 +194,17 @@ $siswa = query("SELECT * FROM siswa");
                     </div>
                     <div class="row">
                         <div class="col">
-                            <div class="card card-outline card-primary">
+                            <div class="card card-outline card-warning">
                                 <div class="card-body table-responsive p-0" id="tabel">
                                     <table class="table table-hover text-nowrap">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Nama Staff</th>
+                                                <?php if ($role == 'Admin') {
+                                                    echo '<th>Nama Staff</th>';
+                                                } else {
+                                                    echo '';
+                                                } ?>
                                                 <th>NIS</th>
                                                 <th>Nama Siswa</th>
                                                 <th>Status Beasiswa</th>
@@ -211,7 +215,11 @@ $siswa = query("SELECT * FROM siswa");
                                                 <?php foreach ($result as $index => $row): ?>
                                                     <tr>
                                                         <td><?= $index + 1 + $startData; ?></td>
-                                                        <td><?= htmlspecialchars($row['nama_user']); ?></td>
+                                                        <?php if ($role == 'Admin') {
+                                                            echo '<td>' . htmlspecialchars($row["nama_user"]) . '</td>';
+                                                        } else {
+                                                            echo '';
+                                                        } ?>
                                                         <td><?= htmlspecialchars($row['nis']); ?></td>
                                                         <td><?= htmlspecialchars($row['nama_siswa']); ?></td>
                                                         <td><?= htmlspecialchars($row['keterangan']); ?></td>
@@ -335,16 +343,6 @@ $siswa = query("SELECT * FROM siswa");
             $('.select2').select2()
         });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const formattedDate = today.getFullYear() + '-' +
-                String(today.getMonth() + 1).padStart(2, '0') + '-' +
-                String(today.getDate()).padStart(2, '0');
-            document.getElementById('date_report').value = formattedDate;
-        });
-    </script>
-
 </body>
 
 </html>

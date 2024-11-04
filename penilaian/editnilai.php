@@ -9,15 +9,11 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
 $user_id = $_SESSION['id'];
 $role = $_SESSION['role'];
 
-if (isset($_GET["id_siswa"])) {
+if (isset($_GET["id_siswa"]) && is_numeric($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {
-    header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
-    exit;
-}
-
-if ($id_siswa === null) {
-    header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 
@@ -30,7 +26,8 @@ if ($role == 'Admin') {
 $variabel = query("SELECT * FROM variabel");
 
 if (empty($siswa)) {
-    header("Location: ../error/error.php?message=ID Siswa tidak valid");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 $siswa = $siswa[0];

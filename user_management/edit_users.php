@@ -11,19 +11,22 @@ if ($_SESSION['role'] !== 'Admin') {
     exit;
 }
 
-if (isset($_GET["id"])) {
+if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
     $id = $_GET["id"];
 } else {
-    header("Location: ../error/error.php?message=ID Users tidak ditemukan");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 
-if ($id === null) {
-    header("Location: ../error/error.php?message=ID Users tidak ditemukan");
+$users = query("SELECT * FROM users WHERE id = $id");
+if (empty($users)) {
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 
-$users = query("SELECT * FROM users WHERE id = $id")[0];
+$users = $users[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Ambil nilai yang dikirimkan untuk username baru
@@ -60,10 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-if (empty($users)) {
-    header("Location: ../error/error.php?message=ID Users tidak valid");
-    exit;
-}
+
 
 ?>
 

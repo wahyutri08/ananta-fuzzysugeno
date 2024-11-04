@@ -11,31 +11,54 @@ $role = $_SESSION['role'];
 
 $variabel = query("SELECT * FROM variabel");
 $jumlahDataPerHalaman = 10;
+if (isset($_POST["keyword"])) {
+    $keyword = $_POST["keyword"];
+} else {
+    $keyword = '';
+}
 
-if ($role == 'Admin') {
-    $jumlahData = count(query("SELECT * FROM siswa"));
-} elseif ($role == 'Staff') {
-    $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
+if (!empty($keyword)) {
+    if ($role == 'Admin') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE 
+                    nis LIKE '%$keyword%' OR
+                    nama_siswa LIKE '%$keyword%'"));
+    } elseif ($role == 'Staff') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND 
+                    nis LIKE '%$keyword%' OR
+                    nama_siswa LIKE '%$keyword%'"));
+    }
+} else {
+    if ($role == 'Admin') {
+        $jumlahData = count(query("SELECT * FROM siswa"));
+    } elseif ($role == 'Staff') {
+        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
+    }
 }
 
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-$halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
+if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
+    $halamanAktif = (int)$_GET["page"];
+} else {
+    $halamanAktif = 1;
+}
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
 // Query berdasarkan role pengguna
-if ($role == 'Admin') {
-    $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
-} elseif ($role == 'Staff') {
-    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
-}
-
-// Jika ada pencarian
-if (isset($_POST["search"])) {
-    $keyword = $_POST["keyword"];
+if (!empty($keyword)) {
     if ($role == 'Admin') {
-        $d_siswa = searchSiswa($keyword);
+        $d_siswa = query("SELECT * FROM siswa WHERE 
+                    nis LIKE '%$keyword%' OR
+                    nama_siswa LIKE '%$keyword%' LIMIT $awalData, $jumlahDataPerHalaman");
     } elseif ($role == 'Staff') {
-        $d_siswa = searchSiswa($keyword, $user_id);
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND 
+                    nis LIKE '%$keyword%' OR
+                    nama_siswa LIKE '%$keyword%' LIMIT $awalData, $jumlahDataPerHalaman");
+    }
+} else {
+    if ($role == 'Admin') {
+        $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+    } elseif ($role == 'Staff') {
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
     }
 }
 
@@ -101,7 +124,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
-                                    <h3 class="card-title"><a href="add_siswa.php" class="btn btn-sm btn-block bg-gradient-danger"><i class="fas fa-file-pdf"></i> Cetak PDF</a></h3>
                                     <div class="card-tools mt-2">
                                         <form action="" method="POST">
                                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -129,67 +151,64 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($d_siswa as $siswa) : ?>
-                                                <tr>
-                                                    <td><?= $siswa["nis"]; ?></td>
-                                                    <td><?= $siswa["nama_siswa"]; ?></td>
-                                                    <?php foreach ($variabel as $v) : ?>
-                                                        <td>
-                                                            <?php $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']);
-                                                            if ($penilaian) {
-                                                                echo $penilaian[0]['nilai'];
-                                                            } else {
-                                                                echo "";
-                                                            }
-                                                            ?>
-                                                        </td>
-                                                    <?php endforeach; ?>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
-                                                                Action
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                <li><a class="dropdown-item" href="editnilai.php?id_siswa=<?= $siswa["id_siswa"]; ?>" onclick="edit(<?= $siswa['id_siswa'] ?>)">Edit</a></li>
-                                                                <?php
-                                                                // Pastikan $siswa dan $siswa terdefinisi dan memiliki nilai sebelum digunakan
-                                                                if (isset($penilaian[0]['nilai']) && isset($siswa["id_siswa"])) {
-                                                                    if ($penilaian[0]['nilai'] !== null && $penilaian[0]['nilai'] !== "") {
-                                                                        echo '<li><a class="dropdown-item tombol-hapus" href="delete_nilai.php?id_siswa=' . $siswa['id_siswa'] . '">Delete</a></li>';
-                                                                    } else {
-                                                                        echo "";
-                                                                    }
+                                            <?php if ($jumlahData > 0): ?>
+                                                <?php foreach ($d_siswa as $siswa) : ?>
+                                                    <tr>
+                                                        <td><?= $siswa["nis"]; ?></td>
+                                                        <td><?= $siswa["nama_siswa"]; ?></td>
+                                                        <?php foreach ($variabel as $v) : ?>
+                                                            <td>
+                                                                <?php $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']);
+                                                                if ($penilaian) {
+                                                                    echo $penilaian[0]['nilai'];
+                                                                } else {
+                                                                    echo "";
                                                                 }
                                                                 ?>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
+                                                            </td>
+                                                        <?php endforeach; ?>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">
+                                                                    Action
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                                    <li><a class="dropdown-item" href="editnilai.php?id_siswa=<?= $siswa["id_siswa"]; ?>" onclick="edit(<?= $siswa['id_siswa'] ?>)">Edit</a></li>
+                                                                    <?php
+                                                                    // Pastikan $siswa dan $siswa terdefinisi dan memiliki nilai sebelum digunakan
+                                                                    if (isset($penilaian[0]['nilai']) && isset($siswa["id_siswa"])) {
+                                                                        if ($penilaian[0]['nilai'] !== null && $penilaian[0]['nilai'] !== "") {
+                                                                            echo '<li><a class="dropdown-item tombol-hapus" href="delete_nilai.php?id_siswa=' . $siswa['id_siswa'] . '">Delete</a></li>';
+                                                                        } else {
+                                                                            echo "";
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <tr>
+                                                    <td colspan="9" class="text-center">No data found</td>
                                                 </tr>
-                                            <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-footer clearfix">
-                                    <ul class="pagination pagination-sm m-0 float-right">
-                                        <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                        <?php
-                                        // Batasi jumlah maksimum item navigasi menjadi 5
-                                        $jumlahTampil = min(5, $jumlahHalaman);
-                                        // Hitung titik awal iterasi untuk tetap berada di tengah
-                                        $start = max(1, min($halamanAktif - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
-                                        // Hitung titik akhir iterasi
-                                        $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
-
-                                        for ($i = $start; $i <= $end; $i++) :
-                                            if ($i == $halamanAktif) : ?>
-                                                <li class="page-item active"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                            <?php else : ?>
-                                                <li class="page-item"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                        <?php endif;
-                                        endfor; ?>
-                                        <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
-                                    </ul>
+                                    <div class="showing-entries">
+                                        <span id="showing-entries">Showing <?= ($awalData + 1); ?> to <?= min($awalData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <ul class="pagination pagination-sm m-0 float-right">
+                                            <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
+                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <?php endfor; ?>
+                                            <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -259,69 +278,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     }
                 });
             });
-
-            // Fungsi untuk menangani kueri pencarian
-            function handleSearchQuery() {
-                var keyword = $('#keyword').val();
-                $.get('../ajax/penilaian.php?keyword=' + keyword, function(data) {
-                    $('#tabel').html(data);
-                    // Initialize ulang tombol-hapus setelah memuat data baru
-                    $('.tombol-hapus').on('click', function(e) {
-                        e.preventDefault();
-                        const href = $(this).attr('href');
-
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "Data Akan Dihapus",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.value) {
-                                $.ajax({
-                                    url: href,
-                                    type: 'GET',
-                                    success: function(response) {
-                                        let res = JSON.parse(response);
-                                        if (res.status === 'success') {
-                                            Swal.fire({
-                                                title: 'Deleted!',
-                                                text: 'Data Berhasil Dihapus',
-                                                icon: 'success',
-                                                showConfirmButton: true
-                                            }).then(() => {
-                                                window.location.href = '../penilaian';
-                                            });
-                                        } else if (res.status === 'error') {
-                                            Swal.fire('Error', 'Data Gagal Dihapus', 'error');
-                                        } else if (res.status === 'redirect') {
-                                            window.location.href = '../login';
-                                        }
-                                    },
-                                    error: function() {
-                                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
-                                    }
-                                });
-                            }
-                        });
-                    });
-                });
-            }
-
-            // Sembunyikan tombol cari saat halaman dimuat
-            $('#tombol-cari').hide();
-
-            // Event ketika tombol cari ditekan
-            $('#tombol-cari').on('click', function(e) {
-                e.preventDefault();
-                handleSearchQuery();
-            });
-
-            // Event ketika mengetik di kolom pencarian
-            $('#keyword').on('keyup', function() {
-                handleSearchQuery();
+            $('#keyword').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#tombol-cari').click();
+                }
             });
         });
     </script>

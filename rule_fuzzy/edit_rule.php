@@ -11,24 +11,22 @@ if ($_SESSION['role'] !== 'Admin') {
     exit;
 }
 
-if (isset($_GET["id_rule"])) {
+if (isset($_GET["id_rule"]) && is_numeric($_GET["id_rule"])) {
     $id_rule = $_GET["id_rule"];
 } else {
-    header("Location: ../error/error.php?message=ID Rule tidak ditemukan");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 
-if ($id_rule === null) {
-    header("Location: ../error/error.php?message=ID Rule tidak ditemukan");
-    exit;
-}
-
-$rule_fuzzy = query("SELECT * FROM rule_fuzzy WHERE id_rule = $id_rule")[0];
+$rule_fuzzy = query("SELECT * FROM rule_fuzzy WHERE id_rule = $id_rule");
 
 if (empty($rule_fuzzy)) {
-    header("Location: ../error/error.php?message=ID Rule tidak valid");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
+$rule_fuzzy = $rule_fuzzy[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = editRule($_POST);

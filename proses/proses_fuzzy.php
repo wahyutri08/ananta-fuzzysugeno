@@ -8,7 +8,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-
 $user_id = $_SESSION['id'];
 $role = $_SESSION['role'];
 
@@ -23,6 +22,7 @@ if ($role == 'Admin') {
 }
 
 $data = []; // Array untuk menyimpan hasil proses fuzzy per siswa
+$errors = []; // Array untuk menyimpan error jika ada kegagalan
 
 // Loop melalui data siswa
 foreach ($d_siswa as $siswa) {
@@ -62,15 +62,16 @@ foreach ($d_siswa as $siswa) {
     date_default_timezone_set('Asia/Jakarta');
     $simpan = simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $nilai_uas, $keaktifan, $penghasilan, $nilai_fuzzy, $keterangan, date('Y-m-d'));
 
-    echo json_encode(["status" => "success", "message" => "Proses Berhasil"]);
     // Cek apakah penyimpanan berhasil
     if (!$simpan) {
-        echo json_encode(["status" => "error", "message" => "Gagal menyimpan hasil untuk siswa dengan NIS: $nis"]);
-        exit;
+        $errors[] = "Gagal menyimpan hasil untuk siswa dengan NIS: $nis";
     }
 }
-echo json_encode(["status" => "success", "message" => "Semua data berhasil diproses dan disimpan"]);
+
+
+if (empty($errors)) {
+    echo json_encode(["status" => "success", "message" => "Semua data berhasil diproses dan disimpan"]);
+} else {
+    echo json_encode(["status" => "error", "message" => implode("; ", $errors)]);
+}
 exit;
-// Redirect kembali setelah proses selesai
-// header("Location: ../hasil_fuzzy");
-// exit;

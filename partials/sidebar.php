@@ -4,7 +4,7 @@ $current_page = basename($_SERVER['REQUEST_URI']);
 
 // Halaman-halaman yang berada di dalam Master Data
 $master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian',];
-$keputusan = ['hasil_analisa'];
+$keputusan = ['proses'];
 $settings_page = ['profile', 'change_password'];
 $id = $_SESSION["id"];
 $role = $_SESSION["role"];
@@ -97,7 +97,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="../hasil_analisa" class="nav-link <?= ($current_page == 'hasil_analisa') ? 'active' : '' ?>">
+                            <a href="../proses" class="nav-link <?= ($current_page == 'proses') ? 'active' : '' ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Proses</p>
                             </a>
@@ -108,7 +108,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                 <!-- Laporan Hasil Analisa -->
                 <li class="nav-header">LAPORAN</li>
                 <li class="nav-item">
-                    <a href="../hasil_fuzzy" class="nav-link <?= ($current_page == 'laporan_analisa') ? 'active' : '' ?>">
+                    <a href="../hasil_fuzzy" class="nav-link <?= ($current_page == 'hasil_fuzzy') ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-file-invoice"></i>
                         <p>Laporan Hasil Analisa</p>
                     </a>
