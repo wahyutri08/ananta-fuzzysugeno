@@ -57,7 +57,6 @@ if (isset($_POST["login"])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
@@ -66,14 +65,17 @@ if (isset($_POST["login"])) {
     <link rel="stylesheet" href="../assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="../assets/dist/css/style.css">
 </head>
 
 <body class="hold-transition login-page">
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
-            <div class="card-header text-center">
-                <a href="../login" class="h1"><b>JOKI NYA PUSING</b></a>
+            <div class="card-header">
+                <img src="../assets/dist/img/logo.jpeg" alt="" id="logo" class="brand-image img-circle">
+                <a href="../login" class="h4 ml-2"><b>SMKS BINONG PERMAI</b></a>
             </div>
             <div class="card-body">
                 <?php if ($error) : ?>
@@ -81,11 +83,11 @@ if (isset($_POST["login"])) {
                         <?= $error ?>
                     </div>
                 <?php endif; ?>
-                <!-- <p class="login-box-msg h3">LOGIN</p> -->
+                <p class="login-box-msg">Login in to start your session</p>
 
                 <form action="" method="POST">
                     <div class="input-group mb-3">
-                        <input type="username" id="username" name="username" class="form-control" placeholder="Username atau Email" required>
+                        <input type="username" id="username" name="username" class="form-control" placeholder="Username atau Email" required autocomplete="off">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>

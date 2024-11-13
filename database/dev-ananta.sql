@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 21, 2024 at 09:37 PM
+-- Generation Time: Nov 13, 2024 at 06:55 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -42,13 +42,6 @@ CREATE TABLE `hasil_fuzzy` (
   `date_report` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `hasil_fuzzy`
---
-
-INSERT INTO `hasil_fuzzy` (`id_hasil`, `user_id`, `id_siswa`, `nis`, `nama_siswa`, `nilai_uts`, `nilai_uas`, `keaktifan`, `penghasilan`, `nilai_fuzzy`, `keterangan`, `date_report`) VALUES
-(255, 13, 32, '1001', 'Ahmad Rizki Hidayat', '90', '50', '90', '2000000', '80', 'Layak', '2024-10-21');
-
 -- --------------------------------------------------------
 
 --
@@ -62,16 +55,6 @@ CREATE TABLE `penilaian` (
   `id_variabel` int(11) NOT NULL,
   `nilai` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `penilaian`
---
-
-INSERT INTO `penilaian` (`id_penilaian`, `user_id`, `id_siswa`, `id_variabel`, `nilai`) VALUES
-(183, 13, 32, 1, 90),
-(184, 13, 32, 2, 50),
-(185, 13, 32, 3, 90),
-(186, 13, 32, 4, 2000000);
 
 -- --------------------------------------------------------
 
@@ -124,31 +107,6 @@ CREATE TABLE `siswa` (
   `email` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `siswa`
---
-
-INSERT INTO `siswa` (`id_siswa`, `user_id`, `nis`, `nama_siswa`, `alamat`, `tanggal_lahir`, `kelas`, `jenis_kelamin`, `no_telfon`, `email`) VALUES
-(32, 13, '1001', 'Ahmad Rizki Hidayat', 'JL Satu Arah', '2024-10-02', '12A', 'Laki-Laki', '09090909', 'tester@tester.com');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `staff`
---
-
-CREATE TABLE `staff` (
-  `id_staff` int(11) NOT NULL,
-  `username` varchar(250) NOT NULL,
-  `email` varchar(250) NOT NULL,
-  `password` varchar(250) NOT NULL,
-  `role` varchar(250) NOT NULL,
-  `alamat` varchar(250) NOT NULL,
-  `no_telefon` varchar(250) NOT NULL,
-  `status` enum('Aktif','Tidak Aktif') NOT NULL,
-  `avatar` varchar(250) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -172,7 +130,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `email`, `nama`, `password`, `role`, `status`, `avatar`) VALUES
 (3, 'ananta.dicapriyo', 'ananta@admin.com', 'Ananta Dicapriyo', '$2y$10$VBIj.EPBimoZyMWbtH8SiOfa7Euo6QI4nsKgXHdznTvAuuP.Inv/O', 'Admin', 'Aktif', '6712aef472d5f.jpg'),
-(13, 'ananta1', 'staff@staff.com', 'Ananta', '$2y$10$JAAEmdRqckSLES2e0GtGS.tiV0dftYHqqHyOrI/lY02QVyjIAvFcS', 'Staff', 'Aktif', '6710e8ea86177.jpg');
+(13, 'ananta1', 'staff@staff.com', 'Ananta', '$2y$10$AFoZktU.nJI.hpt//Vz86elnaAUdZYQln2Mvw8eZc7M9P0OaY4Bse', 'Staff', 'Aktif', '6710e8ea86177.jpg'),
+(20, 'ananta2', 'ananta@staff.com', 'Ananta 2', '$2y$10$TQGYb.tGnDuS1Fj4f44Rgej/xMUl0XdL9KSdCkw.SlnGsd5d9kHHa', 'Staff', 'Tidak Aktif', '6730df8578e84.');
 
 -- --------------------------------------------------------
 
@@ -234,12 +193,6 @@ ALTER TABLE `siswa`
   ADD KEY `fk_user` (`user_id`);
 
 --
--- Indexes for table `staff`
---
-ALTER TABLE `staff`
-  ADD PRIMARY KEY (`id_staff`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -259,13 +212,13 @@ ALTER TABLE `variabel`
 -- AUTO_INCREMENT for table `hasil_fuzzy`
 --
 ALTER TABLE `hasil_fuzzy`
-  MODIFY `id_hasil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+  MODIFY `id_hasil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=260;
 
 --
 -- AUTO_INCREMENT for table `penilaian`
 --
 ALTER TABLE `penilaian`
-  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191;
+  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=195;
 
 --
 -- AUTO_INCREMENT for table `rule_fuzzy`
@@ -277,19 +230,13 @@ ALTER TABLE `rule_fuzzy`
 -- AUTO_INCREMENT for table `siswa`
 --
 ALTER TABLE `siswa`
-  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
-
---
--- AUTO_INCREMENT for table `staff`
---
-ALTER TABLE `staff`
-  MODIFY `id_staff` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `variabel`

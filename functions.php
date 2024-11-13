@@ -7,13 +7,10 @@ function query($query)
     global $db;
     $result = mysqli_query($db, $query);
     $rows = [];
-
-    // Periksa apakah query berhasil dieksekusi
     if ($result) {
         if (mysqli_num_rows($result) > 0) {
-            // Loop melalui hasil query
             while ($row = mysqli_fetch_assoc($result)) {
-                $rows[] = $row; // Menambahkan baris hasil ke dalam array $rows
+                $rows[] = $row;
             }
         }
     } else {
