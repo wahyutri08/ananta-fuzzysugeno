@@ -20,7 +20,6 @@ $keterangan = $_GET['keterangan'] ?? '';
 $queryCount = "SELECT COUNT(*) AS total 
                FROM hasil_fuzzy hf
                JOIN users u ON hf.user_id = u.id
-               JOIN siswa s ON hf.nis = s.nis
                WHERE 1=1";
 
 // Filter berdasarkan tanggal
@@ -52,10 +51,9 @@ $halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["pag
 $startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
 
 // Query untuk mengambil data dengan filter dan paginasi
-$queryData = "SELECT hf.*, u.nama AS nama_user, s.nis, s.nama_siswa 
+$queryData = "SELECT hf.*, u.nama AS nama_user 
               FROM hasil_fuzzy hf
               JOIN users u ON hf.user_id = u.id
-              JOIN siswa s ON hf.nis = s.nis
               WHERE 1=1";
 
 // Filter berdasarkan tanggal

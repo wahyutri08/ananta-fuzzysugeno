@@ -7,7 +7,7 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php'; // Pastikan path sesuai dengan lokasi autoload.php
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
@@ -22,10 +22,9 @@ $role = $_SESSION['role'];
 $variabel = query("SELECT * FROM variabel");
 
 // Query untuk mengambil data hasil dengan filter yang diterapkan
-$query = "SELECT hf.*, u.nama AS nama_user, s.nis, s.nama_siswa 
+$query = "SELECT hf.*, u.nama AS nama_user 
           FROM hasil_fuzzy hf
           JOIN users u ON hf.user_id = u.id
-          JOIN siswa s ON hf.nis = s.nis
           WHERE 1=1";
 
 // Filter tanggal
