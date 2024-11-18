@@ -74,7 +74,7 @@ if (isset($_POST["login"])) {
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <img src="../assets/dist/img/logo.jpg" alt="" id="logo" class="brand-image img-circle">
+                <img src="../assets/dist/img/logo2.png" alt="" id="logo" class="brand-image img-circle">
                 <a href="../login" class="h4 ml-2"><b>SMKS BINONG PERMAI</b></a>
             </div>
             <div class="card-body">

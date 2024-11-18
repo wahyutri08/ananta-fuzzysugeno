@@ -15,14 +15,16 @@ if ($_SESSION['role'] !== 'Admin') {
 $jumlahDataPerHalaman = 10;
 $jumlahData = count(query("SELECT * FROM variabel"));
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-$halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
-$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$variabel = query("SELECT * FROM variabel LIMIT $awalData, $jumlahDataPerHalaman");
+if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
+    $halamanAktif = (int)$_GET["page"];
+} else {
+    $halamanAktif = 1;
+}
 
-// if (isset($_POST["search"])) {
-//     $d_siswa = searchSiswa($_POST["keyword"]);
-// }
+$startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
+
+$variabel = query("SELECT * FROM variabel LIMIT $startData, $jumlahDataPerHalaman");
 ?>
 <!DOCTYPE html>
 <!--
@@ -97,19 +99,37 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $n = 1; ?>
-                                            <?php foreach ($variabel as $v) : ?>
+                                            <?php $n = 1 + $startData; ?>
+                                            <?php if ($jumlahData > 0): ?>
+                                                <?php foreach ($variabel as $v) : ?>
+                                                    <tr>
+                                                        <td><?= $n; ?></td>
+                                                        <td><?= $v["nama_variabel"]; ?></td>
+                                                        <td><?= $v["kat_rendah"]; ?></td>
+                                                        <td><?= $v["kat_sedang"]; ?></td>
+                                                        <td><?= $v["kat_tinggi"]; ?></td>
+                                                    </tr>
+                                                    <?php $n++; ?>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
                                                 <tr>
-                                                    <td><?= $n; ?></td>
-                                                    <td><?= $v["nama_variabel"]; ?></td>
-                                                    <td><?= $v["kat_rendah"]; ?></td>
-                                                    <td><?= $v["kat_sedang"]; ?></td>
-                                                    <td><?= $v["kat_tinggi"]; ?></td>
+                                                    <td colspan="9" class="text-center">No data found</td>
                                                 </tr>
-                                                <?php $n++; ?>
-                                            <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
+                                </div>
+                                <div class="card-footer clearfix">
+                                    <div class="showing-entries">
+                                        <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <ul class="pagination pagination-sm m-0 float-right">
+                                            <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
+                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <?php endfor; ?>
+                                            <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>

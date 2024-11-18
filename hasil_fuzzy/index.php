@@ -108,7 +108,7 @@ $siswa = query("SELECT * FROM siswa");
     <!-- Theme style -->
     <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
 
-<body class="hold-transition sidebar-mini layout-navbar-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <div class="wrapper">
 
         <!-- Navbar -->
@@ -229,7 +229,7 @@ $siswa = query("SELECT * FROM siswa");
                                                                     Action
                                                                 </button>
                                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                                    <li><a class="dropdown-item" href="cetak_hasil.php?id_siswa=<?= $s["id_siswa"]; ?>">Cetak</a></li>
+                                                                    <li><a class="dropdown-item" href="cetak_hasil.php?id_hasil=<?= $row["id_hasil"]; ?>" target="_blank">Cetak</a></li>
                                                                     <?php
                                                                     if ($role == 'Admin') {
                                                                         echo '<li><a class="dropdown-item tombol-hapus" href="delete_hasil.php?id_hasil=' . $row['id_hasil'] . '">Delete</a></li>';
@@ -252,11 +252,31 @@ $siswa = query("SELECT * FROM siswa");
                                     <div class="showing-entries">
                                         <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
                                         <ul class="pagination pagination-sm m-0 float-right">
-                                            <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
-                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <!-- Tombol Previous -->
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a>
+                                            </li>
+
+                                            <?php
+                                            $startPage = max(1, $halamanAktif - 2);
+                                            $endPage = min($jumlahHalaman, $halamanAktif + 2);
+
+                                            if ($halamanAktif <= 3) {
+                                                $endPage = min($jumlahHalaman, 5);
+                                            }
+                                            if ($halamanAktif > $jumlahHalaman - 3) {
+                                                $startPage = max(1, $jumlahHalaman - 4);
+                                            }
+
+                                            for ($i = $startPage; $i <= $endPage; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>">
+                                                    <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                                                </li>
                                             <?php endfor; ?>
-                                            <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>

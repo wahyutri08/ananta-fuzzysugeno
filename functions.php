@@ -498,25 +498,6 @@ function searchSiswa($keyword)
     return query($query);
 }
 
-function generatePagination($jumlahHalaman, $halamanAktif)
-{
-    $pagination = '<ul class="pagination justify-content-end">';
-    $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . max(1, $halamanAktif - 1) . '">Previous</a></li>';
-
-    for ($i = 1; $i <= $jumlahHalaman; $i++) {
-        if ($i == $halamanAktif) {
-            $pagination .= '<li class="page-item active"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-        } else {
-            $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-        }
-    }
-
-    $pagination .= '<li class="page-item"><a class="page-link" href="?page=' . min($jumlahHalaman, $halamanAktif + 1) . '">Next</a></li>';
-    $pagination .= '</ul>';
-
-    return $pagination;
-}
-
 // Fungsi untuk mengkategorikan nilai ke dalam kategori fuzzy (rendah, sedang, tinggi)
 function categorize($tipe, $nilai)
 {

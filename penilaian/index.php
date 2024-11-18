@@ -41,24 +41,24 @@ if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_
 } else {
     $halamanAktif = 1;
 }
-$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+$startData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
 // Query berdasarkan role pengguna
 if (!empty($keyword)) {
     if ($role == 'Admin') {
         $d_siswa = query("SELECT * FROM siswa WHERE 
                     nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' LIMIT $awalData, $jumlahDataPerHalaman");
+                    nama_siswa LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
     } elseif ($role == 'Staff') {
         $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND 
                     nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' LIMIT $awalData, $jumlahDataPerHalaman");
+                    nama_siswa LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
     }
 } else {
     if ($role == 'Admin') {
-        $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+        $d_siswa = query("SELECT * FROM siswa LIMIT $startData, $jumlahDataPerHalaman");
     } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $startData, $jumlahDataPerHalaman");
     }
 }
 
@@ -200,13 +200,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <!-- /.card-body -->
                                 <div class="card-footer clearfix">
                                     <div class="showing-entries">
-                                        <span id="showing-entries">Showing <?= ($awalData + 1); ?> to <?= min($awalData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
                                         <ul class="pagination pagination-sm m-0 float-right">
-                                            <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
-                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
+                                            <!-- Tombol Previous -->
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a>
+                                            </li>
+
+                                            <?php
+                                            $startPage = max(1, $halamanAktif - 2);
+                                            $endPage = min($jumlahHalaman, $halamanAktif + 2);
+
+                                            if ($halamanAktif <= 3) {
+                                                $endPage = min($jumlahHalaman, 5);
+                                            }
+                                            if ($halamanAktif > $jumlahHalaman - 3) {
+                                                $startPage = max(1, $jumlahHalaman - 4);
+                                            }
+
+                                            for ($i = $startPage; $i <= $endPage; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>">
+                                                    <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                                                </li>
                                             <?php endfor; ?>
-                                            <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>

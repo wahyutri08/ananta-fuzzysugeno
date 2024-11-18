@@ -19,14 +19,18 @@ if ($role == 'Admin') {
 }
 
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-$halamanAktif = (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) ? (int)$_GET["page"] : 1;
-$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
+    $halamanAktif = (int)$_GET["page"];
+} else {
+    $halamanAktif = 1;
+}
 
-// Query berdasarkan role pengguna
+$startData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+
 if ($role == 'Admin') {
-    $d_siswa = query("SELECT * FROM siswa LIMIT $awalData, $jumlahDataPerHalaman");
+    $d_siswa = query("SELECT * FROM siswa LIMIT $startData, $jumlahDataPerHalaman");
 } elseif ($role == 'Staff') {
-    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $awalData, $jumlahDataPerHalaman");
+    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $startData, $jumlahDataPerHalaman");
 }
 
 ?>
@@ -128,25 +132,36 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-footer clearfix">
-                                    <ul class="pagination pagination-sm m-0 float-right">
-                                        <li class="page-item"><a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a></li>
-                                        <?php
-                                        // Batasi jumlah maksimum item navigasi menjadi 5
-                                        $jumlahTampil = min(5, $jumlahHalaman);
-                                        // Hitung titik awal iterasi untuk tetap berada di tengah
-                                        $start = max(1, min($halamanAktif - floor($jumlahTampil / 2), $jumlahHalaman - $jumlahTampil + 1));
-                                        // Hitung titik akhir iterasi
-                                        $end = min($start + $jumlahTampil - 1, $jumlahHalaman);
+                                    <div class="showing-entries">
+                                        <span id="showing-entries">Showing <?= ($startData + 1); ?> to <?= min($startData + $jumlahDataPerHalaman, $jumlahData); ?> of <?= $jumlahData; ?> entries</span>
+                                        <ul class="pagination pagination-sm m-0 float-right">
+                                            <!-- Tombol Previous -->
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= max(1, $halamanAktif - 1); ?>">Previous</a>
+                                            </li>
 
-                                        for ($i = $start; $i <= $end; $i++) :
-                                            if ($i == $halamanAktif) : ?>
-                                                <li class="page-item active"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                            <?php else : ?>
-                                                <li class="page-item"><a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a></li>
-                                        <?php endif;
-                                        endfor; ?>
-                                        <li class="page-item"><a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a></li>
-                                    </ul>
+                                            <?php
+                                            $startPage = max(1, $halamanAktif - 2);
+                                            $endPage = min($jumlahHalaman, $halamanAktif + 2);
+
+                                            if ($halamanAktif <= 3) {
+                                                $endPage = min($jumlahHalaman, 5);
+                                            }
+                                            if ($halamanAktif > $jumlahHalaman - 3) {
+                                                $startPage = max(1, $jumlahHalaman - 4);
+                                            }
+
+                                            for ($i = $startPage; $i <= $endPage; $i++) : ?>
+                                                <li class="page-item <?= $i == $halamanAktif ? 'active' : ''; ?>">
+                                                    <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                                                </li>
+                                            <?php endfor; ?>
+
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= min($jumlahHalaman, $halamanAktif + 1); ?>">Next</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>

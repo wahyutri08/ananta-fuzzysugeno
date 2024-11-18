@@ -18,6 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = addRules($_POST);
     if ($result > 0) {
         echo json_encode(["status" => "success", "message" => "Data Berhasil Ditambahkan"]);
+    } elseif ($result == 0) {
+        echo json_encode(["status" => "error", "message" => "Rule Sudah Ada Sebelumnya"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Data Gagal Ditambahkan"]);
     }

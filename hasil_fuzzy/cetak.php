@@ -65,35 +65,103 @@ ob_start();
     <title>Laporan Hasil Beasiswa</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
         }
 
-        table {
+        .header {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header img {
+            width: 60px;
+            height: 60px;
+            vertical-align: middle;
+        }
+
+        .header .title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+        }
+
+        .header .contact {
+            font-size: 10px;
+        }
+
+        h1 {
+            color: goldenrod;
+        }
+
+        .report {
             width: 100%;
+            max-width: 600px;
+            margin: auto;
             border-collapse: collapse;
         }
 
-        table,
-        th,
-        td {
-            border: 1px solid black;
-        }
-
-        th,
-        td {
+        .report th {
+            border: 1px solid #000;
             padding: 8px;
             text-align: center;
         }
 
-        th {
-            background-color: #f2f2f2;
+        .report td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+
+        .report-header1 {
+            margin-bottom: 25px;
+        }
+
+        .report-header td {
+            padding: 5px;
+        }
+
+        .result {
+            margin-top: 15px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <h2 style="text-align: center;">Laporan Hasil Beasiswa</h2>
-    <table>
+    <div class="header">
+        <table width="100%">
+            <tr>
+                <td width="15%">
+                    <img src="../assets/dist/img/logo2.png" alt="Logo Yayasan" width="100" height="100">
+                </td>
+                <td width="70%" align="center">
+                    <div class="title">
+                        <h1><strong>SMKS BINONG PERMAI</strong></h1>
+                    </div>
+                    <div class="contact">
+                        PERUM BINONG PERMAI. CURUG. KAB. TANGERANG 15810 <br>
+                        021-29872830
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="report-header1">
+        <table width="100%">
+            <tr>
+                <td style="text-align: center;">
+                    <h2><strong>Laporan Hasil Beasiswa</strong></h2>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table class="report">
         <thead>
             <tr>
                 <th>No</th>
@@ -126,6 +194,7 @@ ob_start();
             <?php endif; ?>
         </tbody>
     </table>
+
 </body>
 
 </html>
@@ -136,4 +205,4 @@ $html = ob_get_clean();
 // Inisialisasi mPDF dan buat PDF dari HTML
 $mpdf = new Mpdf();
 $mpdf->WriteHTML($html);
-$mpdf->Output('Laporan_Hasil_Fuzzy.pdf', 'I'); // Mengatur output PDF agar langsung ditampilkan di browser
+$mpdf->Output('Laporan_Hasil_Fuzzy.pdf', 'D');

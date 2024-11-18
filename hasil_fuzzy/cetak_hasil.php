@@ -7,20 +7,20 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php'; // Pastikan path sesuai dengan lokasi autoload.php
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
-if (isset($_GET["id_siswa"])) {
-    $id_siswa = $_GET["id_siswa"];
+if (isset($_GET["id_hasil"])) {
+    $id_hasil = $_GET["id_hasil"];
 } else {
     header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
     exit;
 }
 
-$hasil_fuzzy = query("SELECT * FROM hasil_fuzzy WHERE id_siswa = $id_siswa")[0];
+$hasil_fuzzy = query("SELECT * FROM hasil_fuzzy WHERE id_hasil = $id_hasil")[0];
 
-if ($id_siswa === null) {
+if ($id_hasil === null) {
     header("Location: ../error/error.php?message=ID Siswa tidak ditemukan");
     exit;
 }
@@ -46,6 +46,38 @@ ob_start();
             font-family: Arial, sans-serif;
         }
 
+        .header {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header img {
+            width: 60px;
+            height: 60px;
+            vertical-align: middle;
+        }
+
+        .header .title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+        }
+
+        .header .contact {
+            font-size: 10px;
+        }
+
+        h1 {
+            color: goldenrod;
+        }
+
         .report {
             width: 100%;
             max-width: 600px;
@@ -65,7 +97,7 @@ ob_start();
         }
 
         .report-header1 {
-            margin-bottom: 50px;
+            margin-bottom: 25px;
         }
 
         .report-header td {
@@ -81,7 +113,24 @@ ob_start();
 </head>
 
 <body>
-
+    <div class="header">
+        <table width="100%">
+            <tr>
+                <td width="15%">
+                    <img src="../assets/dist/img/logo2.png" alt="Logo Yayasan" width="100" height="100">
+                </td>
+                <td width="70%" align="center">
+                    <div class="title">
+                        <h1><strong>SMKS BINONG PERMAI</strong></h1>
+                    </div>
+                    <div class="contact">
+                        PERUM BINONG PERMAI. CURUG. KAB. TANGERANG 15810 <br>
+                        021-29872830
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
     <div class="report-header1">
         <table width="100%">
             <tr>
@@ -141,4 +190,4 @@ $html = ob_get_clean();
 // Inisialisasi mPDF dan buat PDF dari HTML
 $mpdf = new Mpdf();
 $mpdf->WriteHTML($html);
-$mpdf->Output('Laporan_Hasil_Fuzzy.pdf', 'I');
+$mpdf->Output('Laporan_Hasil_Fuzzy.pdf', 'D');
