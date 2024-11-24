@@ -6,6 +6,12 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+if ($_SESSION !== 'Staff') {
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = addSiswa($_POST);
     if ($result > 0) {

@@ -188,7 +188,9 @@ ob_start();
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td class="text-center" colspan="6">No data found</td>
+                    <td class="text-center" colspan="6">
+                        No data found
+                    </td>
                 </tr>
             <?php endif; ?>
         </tbody>

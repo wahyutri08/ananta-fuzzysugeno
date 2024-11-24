@@ -7,7 +7,8 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
 }
 
 if ($_SESSION['role'] !== 'Admin') {
-    header("Location: ../dashboard");
+    header("HTTP/1.1 404 Not Found");
+    include("../errors/404.html");
     exit;
 }
 

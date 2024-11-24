@@ -152,7 +152,7 @@ $siswa = query("SELECT * FROM siswa");
                                                     <select class="select2" name="user_id" style="width: 100%;">
                                                         <option value="all">-All Staff-</option>
                                                         <?php foreach ($users as $user) : ?>
-                                                            <option value="<?= $user['id']; ?>" <?= $filter_user_id == $user['id'] ? 'selected' : ''; ?>><?= $user['nama']; ?></option>
+                                                            <option value="<?= $user['id']; ?>" <?= $filter_user_id == $user['id'] ? 'selected' : ''; ?>><?= $user['nama']; ?> (<?= $user['username']; ?>)</option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
@@ -167,8 +167,8 @@ $siswa = query("SELECT * FROM siswa");
                                                 </select>
                                             </div>
                                             <div class="form-group col-md-3">
-                                                <label>Status:</label>
-                                                <select class="select2" name="keterangan" style="width: 100%;">
+                                                <label for="keterangan">Status:</label>
+                                                <select class="form-control" name="keterangan" id="keterangan">
                                                     <option value="all" selected>-All Status-</option>
                                                     <option value="Layak" <?= $keterangan == 'Layak' ? 'selected' : ''; ?>>Layak</option>
                                                     <option value="Tidak Layak" <?= $keterangan == 'Tidak Layak' ? 'selected' : ''; ?>>Tidak Layak</option>
