@@ -6,7 +6,7 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION !== 'Staff') {
+if ($_SESSION["role"] !== 'Staff') {
     header("HTTP/1.1 404 Not Found");
     include("../errors/404.html");
     exit;
@@ -72,6 +72,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../dashboard">Home</a></li>
+                                <li class="breadcrumb-item">Master Data</li>
                                 <li class="breadcrumb-item">Data Siswa</li>
                                 <li class="breadcrumb-item active">Tambah Siswa</li>
                             </ol>

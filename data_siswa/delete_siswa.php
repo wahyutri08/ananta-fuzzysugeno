@@ -6,6 +6,7 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
+
 $id_siswa = $_GET["id_siswa"];
 
 if (deleteSiswa($id_siswa) > 0) {

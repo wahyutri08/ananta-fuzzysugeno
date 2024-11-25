@@ -111,6 +111,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../dashboard">Home</a></li>
+                                <li class="breadcrumb-item">Settings</li>
                                 <li class="breadcrumb-item">User Management</li>
                                 <li class="breadcrumb-item">Edit User</li>
                                 <li class="breadcrumb-item active"><?= $users["nama"]; ?></li>

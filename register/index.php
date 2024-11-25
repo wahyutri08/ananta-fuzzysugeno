@@ -6,7 +6,7 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-if ($_SESSION !== 'Admin') {
+if ($_SESSION["role"] !== 'Admin') {
     header("HTTP/1.1 404 Not Found");
     include("../errors/404.html");
     exit;
@@ -69,11 +69,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <!-- <h1 class="m-0">Add User</h1> -->
-                        </div><!-- /.col -->
+                        </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../dashboard">Home</a></li>
+                                <li class="breadcrumb-item">Settings</li>
                                 <li class="breadcrumb-item">User Management</li>
                                 <li class="breadcrumb-item active">Add User</li>
                             </ol>
