@@ -125,7 +125,7 @@ $siswa = query("SELECT * FROM siswa");
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                                 <li class="breadcrumb-item">Laporan</li>
-                                <li class="breadcrumb-item active">Laporan Hasil</li>
+                                <li class="breadcrumb-item active">Laporan Hasil Analisa</li>
                             </ol>
                         </div>
                     </div>

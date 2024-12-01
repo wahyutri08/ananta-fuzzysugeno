@@ -57,6 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode(["status" => "error", "message" => "Format File Bukan Gambar"]);
         } elseif ($result == -2) {
             echo json_encode(["status" => "error", "message" => "Ukuran Gambar Terlalu Besar"]);
+        } elseif ($result == -3) {
+            echo json_encode(["status" => "error", "message" => "Konfirmasi Password Tidak Sesuai"]);
         } else {
             echo json_encode(["status" => "error", "message" => "Data Gagal Diubah"]);
         }

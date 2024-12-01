@@ -64,6 +64,7 @@ function editUsers($data)
     $nama = ucfirst(stripcslashes($data["nama"]));
     $email = strtolower(stripslashes($data["email"]));
     $password = mysqli_real_escape_string($db, $data["password"]);
+    $password2 = mysqli_real_escape_string($db, $data["password2"]);
     $avatarLama = htmlspecialchars($data["avatarLama"]);
     $role = htmlspecialchars($data["role"]);
     $status = htmlspecialchars($data["status"]);
@@ -81,6 +82,11 @@ function editUsers($data)
             // Kesalahan Ukuran Terlalu Besar
             return -2;
         }
+    }
+
+    if ($password !== $password2) {
+        // Password 1 tidak sesuai dengan password 2
+        return -3;
     }
 
     $password = password_hash($password, PASSWORD_DEFAULT);
