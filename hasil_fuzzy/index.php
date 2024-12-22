@@ -83,7 +83,13 @@ $queryData .= " LIMIT $startData, $jumlahDataPerHalaman";
 
 $result = query($queryData);
 $users = query("SELECT * FROM users");
-$siswa = query("SELECT * FROM siswa");
+if ($role == 'Admin') {
+    $siswa = query("SELECT * FROM siswa");
+} else {
+    $siswa = query("SELECT * FROM siswa WHERE user_id = $user_id");
+}
+
+
 
 ?>
 <!DOCTYPE html>
