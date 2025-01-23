@@ -212,6 +212,7 @@ if ($role == 'Admin') {
                                                 <th>NIS</th>
                                                 <th>Nama Siswa</th>
                                                 <th>Status Beasiswa</th>
+                                                <th>Tanggal</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -226,7 +227,16 @@ if ($role == 'Admin') {
                                                         } ?>
                                                         <td><?= htmlspecialchars($row['nis']); ?></td>
                                                         <td><?= htmlspecialchars($row['nama_siswa']); ?></td>
-                                                        <td><?= htmlspecialchars($row['keterangan']); ?></td>
+                                                        <td>
+                                                            <?php
+                                                            if ($row['keterangan'] == 'Layak') {
+                                                                echo '<span class="badge bg-success">' . $row["keterangan"] . '</span>';
+                                                            } else {
+                                                                echo '<span class="badge bg-danger">' . $row["keterangan"] . '</span>';
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                        <td><?= htmlspecialchars($row['date_report']); ?></td>
                                                         <td>
                                                             <div class="dropdown">
                                                                 <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-expanded="false">

@@ -170,6 +170,7 @@ ob_start();
                     <th><?= $v["nama_variabel"]; ?></th>
                 <?php endforeach; ?>
                 <th>Status Beasiswa</th>
+                <th>Tanggal</th>
             </tr>
         </thead>
         <tbody>
@@ -184,6 +185,7 @@ ob_start();
                         <td><?= htmlspecialchars($row['keaktifan']); ?></td>
                         <td><?= htmlspecialchars($row['penghasilan']); ?></td>
                         <td><?= htmlspecialchars($row['keterangan']); ?></td>
+                        <td><?= htmlspecialchars($row['date_report']); ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

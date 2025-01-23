@@ -75,6 +75,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item">Master Data</li>
                                 <li class="breadcrumb-item active">Rule Fuzzy</li>
                             </ol>
                         </div><!-- /.col -->
