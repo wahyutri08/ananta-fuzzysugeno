@@ -159,7 +159,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <div class="row">
             <div class="col-md-12">
-              <div class="card card-primary" style="height: 33rem">
+              <div class="card card-primary overflow-auto" style="height: 33rem">
                 <div class="card-header">
                   <h3 class="card-title">Hasil Beasiswa</h3>
                 </div>
