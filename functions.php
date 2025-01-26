@@ -32,9 +32,18 @@ function register($data)
     $role = htmlspecialchars($data["role"]);
     $status = htmlspecialchars($data["status"]);
 
+    // //  Upload Gambar
+    // $avatar = upload();
+    // if (!$avatar) {
+    //     return -3;
+    // } elseif ($avatar === -1) {
+    //     // Kesalahan Ukuran Terlalu Besar
+    //     return -4;
+    // }
+
     //  Upload Gambar
     $avatar = upload();
-    if (!$avatar) {
+    if ($avatar === -1) {
         return -3;
     }
 
