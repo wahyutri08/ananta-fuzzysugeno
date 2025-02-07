@@ -133,8 +133,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             <tr>
                                                 <th style="width: 10px">No</th>
                                                 <th>Username</th>
-                                                <th>Email</th>
                                                 <th>Nama</th>
+                                                <th>Email</th>
                                                 <th>Role</th>
                                                 <th>Status</th>
                                                 <th></th>
