@@ -167,7 +167,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <?php foreach ($queryHasil as $hasil) : ?>
                     <div class="d-flex align-items-center rounded p-2 my-3 bg-gray-light">
                       <span class="info-box-icon bg-success elevation-1 p-3 rounded">
-                        <i class="fas fa-book"></i>
+                        <a href="../hasil_fuzzy/cetak_hasil.php?id_hasil=<?= $hasil["id_hasil"]; ?>"><i class="fas fa-book"></i></a>
                       </span>
                       <div class="d-flex flex-column flex-grow-1 mr-2 ml-2">
                         <span class="text-black-50 font-weight-bold">
