@@ -645,8 +645,7 @@ function simpanHasilFuzzy($user_id, $id_siswa, $nis, $nama_siswa, $nilai_uts, $n
     $dateReport = mysqli_real_escape_string($db, $dateReport);
 
     $checkQuery = "SELECT * FROM hasil_fuzzy 
-                   WHERE user_id = '$user_id' 
-                   AND nis = '$nis' 
+                   WHERE nis = '$nis' 
                    AND nilai_uts = '$nilai_uts' 
                    AND nilai_uas = '$nilai_uas' 
                    AND keaktifan = '$keaktifan' 
