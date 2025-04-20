@@ -1,14 +1,17 @@
 <?php
-// Mendapatkan halaman saat ini dari URL
-$current_page = basename($_SERVER['REQUEST_URI']);
+// Mendapatkan halaman saat ini tanpa ekstensi .php
+$current_page = pathinfo($_SERVER['REQUEST_URI'], PATHINFO_FILENAME);
 
 // Halaman-halaman yang berada di dalam Master Data
-$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian',];
+$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian'];
 $keputusan = ['proses'];
 $settings_page = ['profile', 'change_password'];
+
+// Ambil data user
 $id = $_SESSION["id"];
 $role = $_SESSION["role"];
 $user = query("SELECT * FROM users WHERE id = $id")[0];
+
 ?>
 
 <div id="sidebar">
@@ -16,7 +19,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
         <div class="sidebar-header position-relative">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
-                    <a href="index.html"><img src="../assets/static/images/logo/logo2.png" style="width: 80px; height: 80px;" alt="Logo" srcset=""></a>
+                    <a href="../home"><img src="../assets/static/images/logo/logo2.png" style="width: 80px; height: 80px;" alt="Logo" srcset=""></a>
                 </div>
                 <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
@@ -65,18 +68,22 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                         <i class="fa fa-edit"></i>
                         <span>Master Data</span>
                     </a>
-                    <ul class="submenu ">
+                    <ul class="submenu">
                         <li class="submenu-item <?= ($current_page == 'data_siswa' ? 'active' : '') ?> ">
                             <a href="../data_siswa" class="submenu-link">Data Siswa</a>
                         </li>
-                        <li class="submenu-item <?= ($current_page == 'data_variabel' ? 'active' : '') ?> ">
-                            <a href="component-alert.html" class="submenu-link">Data Variabel</a>
-                        </li>
+                        <?php
+                        if ($user['role'] == 'Admin') {
+                            echo '<li class="submenu-item ' . ($current_page == 'data_variabel' ? 'active' : '') . '">
+                                    <a href="../data_variabel" class="submenu-link">Data Variabel</a>
+                                </li>
+                                <li class="submenu-item ' . ($current_page == 'rule_fuzzy' ? 'active' : '') . '">
+                                    <a href="../rule_fuzzy" class="submenu-link">Rule Fuzzy</a>
+                                </li>';
+                        }
+                        ?>
                         <li class="submenu-item  ">
-                            <a href="component-badge.html" class="submenu-link">Rule Fuzzy</a>
-                        </li>
-                        <li class="submenu-item  ">
-                            <a href="component-breadcrumb.html" class="submenu-link">Penilaian</a>
+                            <a href="../penilaian" class="submenu-link">Penilaian</a>
                         </li>
                     </ul>
                 </li>
@@ -114,12 +121,14 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                         </li>
                     </ul>
                 </li>
-                <li class="sidebar-item">
-                    <a href="#" class='sidebar-link'>
-                        <i class="fa fa-user-cog"></i>
-                        <span>User Management</span>
-                    </a>
-                </li>
+                <?php if ($user['role'] == 'Admin') : ?>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link <?= ($current_page == 'user_management' ? 'active' : '') ?>">
+                            <i class="fa fa-user-cog"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <li class="sidebar-item">
                     <a href="../logout" class='sidebar-link'>
                         <i class="fa fa-sign-out-alt"></i>
