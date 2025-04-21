@@ -120,7 +120,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="kelas">Kelas <span class="text-danger">*</span></label>
-                                                    <input type="kelas" class="form-control" name="kelas" id="kelas" placeholder="Kelas" required>
+                                                    <input type="text" class="form-control" name="kelas" id="kelas" placeholder="Kelas" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Jenis Kelamin <span class="text-danger">*</span></label>

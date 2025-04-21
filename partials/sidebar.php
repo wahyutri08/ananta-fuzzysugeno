@@ -155,6 +155,12 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     echo '';
                 }
                 ?>
+                <li class="nav-item">
+                    <a href="../logout" class="nav-link">
+                        <i class="nav-icon fas fa-power-off"></i>
+                        <p>Logout</p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

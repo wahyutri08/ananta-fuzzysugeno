@@ -107,6 +107,7 @@ if (!empty($keyword)) {
                                         <?php foreach ($variabel as $v) : ?>
                                             <th><?= $v["nama_variabel"] ?></th>
                                         <?php endforeach; ?>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -82,7 +82,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                                 </li>';
                         }
                         ?>
-                        <li class="submenu-item  ">
+                        <li class="submenu-item <?= ($current_page == 'penilaian' ? 'active' : '') ?> ">
                             <a href="../penilaian" class="submenu-link">Penilaian</a>
                         </li>
                     </ul>
