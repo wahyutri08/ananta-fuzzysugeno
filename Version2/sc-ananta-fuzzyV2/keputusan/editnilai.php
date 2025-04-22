@@ -9,7 +9,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
 $user_id = $_SESSION['id'];
 $role = $_SESSION['role'];
 
-
 if (isset($_GET["id_siswa"]) && is_numeric($_GET["id_siswa"])) {
     $id_siswa = $_GET["id_siswa"];
 } else {
@@ -18,13 +17,13 @@ if (isset($_GET["id_siswa"]) && is_numeric($_GET["id_siswa"])) {
     exit;
 }
 
-
 if ($role == 'Admin') {
     $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
 } else {
     $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa AND user_id = $user_id");
 }
 
+$variabel = query("SELECT * FROM variabel");
 
 if (empty($siswa)) {
     header("HTTP/1.1 404 Not Found");
@@ -34,14 +33,15 @@ if (empty($siswa)) {
 $siswa = $siswa[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $result = editSiswa($_POST);
-    if ($result > 0) {
-        echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
-    } elseif ($result == -1) {
-        echo json_encode(["status" => "error", "message" => "NIS Already Existed"]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Data Failed to Update"]);
+    // Pengecekan apakah ada data yang diinput
+    if (empty($_POST)) {
+        echo json_encode(["status" => "error", "message" => "No Data Was Inputted"]);
+        exit;
     }
+
+    // Memanggil fungsi jika ada data yang diinput
+    dataPostNilai($_POST, $_GET, $role, $user_id);
+    echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
     exit;
 }
 ?>
@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="page-title mb-3">
                     <div class="row">
                         <div class="col-12 col-md-6 order-md-1 order-last">
-                            <h3>Tambah Data Siswa</h3>
+                            <h3>Edit Nilai</h3>
                         </div>
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav
@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <li class="breadcrumb-item" aria-current="page">
                                         Master Data
                                     </li>
-                                    <li class="breadcrumb-item" aria-current="page">Data Siswa</li>
+                                    <li class="breadcrumb-item" aria-current="page">Penilaian</li>
                                     <li class="breadcrumb-item" aria-current="page">Edit</li>
                                     <li class="breadcrumb-item active" aria-current="page"><?= $siswa["nama_siswa"]; ?></li>
                                 </ol>
@@ -110,112 +110,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">DATA SISWA</h4>
+                                    <h4 class="card-title">NILAI SISWA</h4>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
                                         <form method="POST" action="" enctype="multipart/form-data" class="form" data-parsley-validate id="myForm">
                                             <input type="hidden" name="id_siswa" value="<?= $siswa["id_siswa"]; ?>">
                                             <div class="row">
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="nis" class="form-label">NIS</label>
-                                                        <input
-                                                            type="text"
-                                                            id="nis"
-                                                            class="form-control"
-                                                            placeholder="NIS"
-                                                            name="nis"
-                                                            value="<?= $siswa["nis"]; ?>"
-                                                            data-parsley-required="true" />
+                                                <?php foreach ($variabel as $v) : ?>
+                                                    <div class="col-md-6 col-12">
+                                                        <div class="form-group mandatory">
+                                                            <label for="<?= $v["id_variabel"]; ?>" class="form-label"><?= $v["nama_variabel"]; ?></label>
+                                                            <?php
+                                                            // Cek role, ambil nilai hanya jika user adalah admin atau terkait sebagai staff
+                                                            if ($role == 'Admin') {
+                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']);
+                                                            } elseif ($role == 'Staff') {
+                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel'] . " AND user_id = " . $user_id);
+                                                            }
+
+                                                            if ($penilaian) {
+                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" data-parsley-required="true" value="' . $penilaian[0]['nilai'] . '">';
+                                                            } else {
+                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="">';
+                                                            }
+                                                            ?>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="nama_siswa" class="form-label">Nama Siswa</label>
-                                                        <input
-                                                            type="text"
-                                                            id="nama_siswa"
-                                                            class="form-control"
-                                                            placeholder="Nama Siswa"
-                                                            name="nama_siswa"
-                                                            value="<?= $siswa["nama_siswa"]; ?>"
-                                                            data-parsley-required="true" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="alamat" class="form-label">Alamat</label>
-                                                        <input
-                                                            type="text"
-                                                            id="alamat"
-                                                            class="form-control"
-                                                            placeholder="Alamat"
-                                                            name="alamat"
-                                                            value="<?= $siswa["alamat"]; ?>"
-                                                            data-parsley-required="true" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                        <input
-                                                            type="date"
-                                                            id="tanggal_lahir"
-                                                            class="form-control"
-                                                            name="tanggal_lahir"
-                                                            value="<?= $siswa["tanggal_lahir"]; ?>"
-                                                            placeholder="Tanggal Lahir"
-                                                            data-parsley-required="true" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="kelas" class="form-label">Kelas</label>
-                                                        <input
-                                                            type="text"
-                                                            id="kelas"
-                                                            class="form-control"
-                                                            name="kelas"
-                                                            placeholder="Kelas"
-                                                            value="<?= $siswa["kelas"]; ?>"
-                                                            data-parsley-required="true" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <fieldset class="form-group mandatory">
-                                                        <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                                                        <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
-                                                            <option value="" disabled selected>Choose..</option>
-                                                            <option value="Laki-Laki" <?= ($siswa["jenis_kelamin"] == "Laki-Laki") ? "selected" : "" ?>>Laki-Laki</option>
-                                                            <option value="Perempuan" <?= ($siswa["jenis_kelamin"] == "Perempuan") ? "selected" : "" ?>>Perempuan</option>
-                                                        </select>
-                                                    </fieldset>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="no_telfon" class="form-label">No Telepon</label>
-                                                        <input
-                                                            type="text"
-                                                            id="no_telfon"
-                                                            class="form-control"
-                                                            name="no_telfon"
-                                                            placeholder="No Telepon"
-                                                            value="<?= $siswa["no_telfon"]; ?>" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <div class="form-group mandatory">
-                                                        <label for="email" class="form-label">Email</label>
-                                                        <input
-                                                            type="email"
-                                                            id="email"
-                                                            class="form-control"
-                                                            name="email"
-                                                            value="<?= $siswa["email"]; ?>"
-                                                            data-parsley-required="true" />
-                                                    </div>
-                                                </div>
+                                                <?php endforeach; ?>
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-flex justify-content-end">
@@ -277,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 text: res.message,
                                 icon: "success"
                             }).then(() => {
-                                window.location.href = '../data_siswa';
+                                window.location.href = '../keputusan';
                             });
                         } else {
                             Swal2.fire('Error', res.message, 'error');

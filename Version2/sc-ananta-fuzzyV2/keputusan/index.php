@@ -11,41 +11,11 @@ $role = $_SESSION['role'];
 
 $variabel = query("SELECT * FROM variabel");
 
-if (!empty($keyword)) {
-    if ($role == 'Admin') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%'"));
-    } elseif ($role == 'Staff') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%'"));
-    }
-} else {
-    if ($role == 'Admin') {
-        $jumlahData = count(query("SELECT * FROM siswa"));
-    } elseif ($role == 'Staff') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id"));
-    }
-}
-
 // Query berdasarkan role pengguna
-if (!empty($keyword)) {
-    if ($role == 'Admin') {
-        $d_siswa = query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%'");
-    } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%'");
-    }
-} else {
-    if ($role == 'Admin') {
-        $d_siswa = query("SELECT * FROM siswa");
-    } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id");
-    }
+if ($role == 'Admin') {
+    $d_siswa = query("SELECT * FROM siswa");
+} elseif ($role == 'Staff') {
+    $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id");
 }
 ?>
 
@@ -98,6 +68,11 @@ if (!empty($keyword)) {
                 </div>
                 <section class="section">
                     <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">
+                                <a href="proses_fuzzy.php" class="btn icon icon-left btn-warning" id="proses"><i class="fa fa-cogs me-2"></i> Proses Fuzzy</a>
+                            </h5>
+                        </div>
                         <div class="card-body">
                             <table class="table table-striped" id="table1">
                                 <thead>
@@ -135,16 +110,11 @@ if (!empty($keyword)) {
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
                                                         <a class="dropdown-item" href="editnilai.php?id_siswa=<?= $siswa["id_siswa"]; ?>">Edit</a>
-                                                        <?php
-                                                        // Pastikan $siswa dan $siswa terdefinisi dan memiliki nilai sebelum digunakan
-                                                        if (isset($penilaian[0]['nilai']) && isset($siswa["id_siswa"])) {
-                                                            if ($penilaian[0]['nilai'] !== null && $penilaian[0]['nilai'] !== "") {
-                                                                echo '<a class="dropdown-item tombol-hapus" href="delete_nilai.php?id_siswa=' . $siswa['id_siswa'] . '">Delete</a>';
-                                                            } else {
-                                                                echo "";
-                                                            }
-                                                        }
-                                                        ?>
+                                                        <?php if (isset($penilaian[0]['nilai']) && isset($siswa["id_siswa"])): ?>
+                                                            <?php if ($penilaian[0]['nilai'] !== null && $penilaian[0]['nilai'] !== ""): ?>
+                                                                <a class="dropdown-item tombol-hapus" href="delete_nilai.php?id_siswa=<?= $siswa['id_siswa']; ?>">Delete</a>
+                                                            <?php endif; ?>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </td>
@@ -161,14 +131,90 @@ if (!empty($keyword)) {
             <!-- End Footer -->
         </div>
     </div>
+    <script src="../assets/extensions/jquery/jquery.min.js"></script>
     <script src="../assets/static/js/components/dark.js"></script>
     <script src="../assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="../assets/compiled/js/app.js"></script>
     <script src="../assets/extensions/simple-datatables/umd/simple-datatables.js"></script>
     <script src="../assets/static/js/pages/simple-datatables.js"></script>
+    <script src="../assets/extensions/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="../assets/static/js/pages/sweetalert2.js"></script>
     <!-- Need: Apexcharts -->
     <script src="../assets/extensions/apexcharts/apexcharts.min.js"></script>
     <!-- <script src="../assets/static/js/pages/dashboard.js"></script> -->
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.tombol-hapus', function(e) {
+                e.preventDefault();
+                const href = $(this).attr('href');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This Data Will Be Deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: href,
+                            type: 'GET',
+                            success: function(response) {
+                                let res = JSON.parse(response);
+                                if (res.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Deleted!',
+                                        text: 'Data Successfully Deleted',
+                                        icon: 'success',
+                                        showConfirmButton: true,
+                                    }).then(() => {
+                                        location.reload(); // atau reload DataTable ajax jika pakai ajax
+                                    });
+                                } else {
+                                    Swal.fire('Error', 'Gagal menghapus data', 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Terjadi kesalahan server', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#proses').on('click', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: 'proses_fuzzy.php',
+                    method: 'POST',
+                    success: function(response) {
+                        response = JSON.parse(response);
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                title: "Success",
+                                text: response.message,
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = '../hasil_fuzzy';
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

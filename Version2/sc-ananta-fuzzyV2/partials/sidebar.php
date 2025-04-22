@@ -3,8 +3,8 @@
 $current_page = pathinfo($_SERVER['REQUEST_URI'], PATHINFO_FILENAME);
 
 // Halaman-halaman yang berada di dalam Master Data
-$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian'];
-$keputusan = ['proses'];
+$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy'];
+$keputusan = ['keputusan'];
 $settings_page = ['profile', 'change_password'];
 
 // Ambil data user
@@ -82,19 +82,16 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                                 </li>';
                         }
                         ?>
-                        <li class="submenu-item <?= ($current_page == 'penilaian' ? 'active' : '') ?> ">
-                            <a href="../penilaian" class="submenu-link">Penilaian</a>
-                        </li>
                     </ul>
                 </li>
-                <li class="sidebar-item  has-sub">
-                    <a href="#" class='sidebar-link'>
+                <li class="sidebar-item <?= (in_array($current_page, $keputusan)) ? 'active' : '' ?> has-sub">
+                    <a href="#" class='sidebar-link <?= (in_array($current_page, $keputusan)) ? 'submenu-open' : '' ?>'>
                         <i class="fa fa-cogs"></i>
                         <span>Keputusan</span>
                     </a>
-                    <ul class="submenu ">
-                        <li class="submenu-item  ">
-                            <a href="component-accordion.html" class="submenu-link">Proses</a>
+                    <ul class="submenu">
+                        <li class="submenu-item <?= ($current_page == 'keputusan' ? 'active' : '') ?>">
+                            <a href="../keputusan" class="submenu-link">Penilaian</a>
                         </li>
                     </ul>
                 </li>
