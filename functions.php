@@ -310,7 +310,7 @@ function editNilai($post, $get, $key, $role, $user_id)
 {
     global $db;
 
-    // Cek role untuk menentukan query
+    // // Cek role untuk menentukan query
     if ($role == 'Admin') {
         // Admin bisa mengedit semua data
         $query = "UPDATE penilaian SET 

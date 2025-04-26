@@ -148,7 +148,7 @@ function upload()
     $namaFileBaru .= '.';
     $namaFileBaru .= $ekstensiAvatar;
 
-    move_uploaded_file($tmpName, '../assets/dist/img/' . $namaFileBaru);
+    move_uploaded_file($tmpName, '../assets/static/images/' . $namaFileBaru);
 
     return $namaFileBaru;
 }

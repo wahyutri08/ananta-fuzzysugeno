@@ -8,7 +8,7 @@ header("Pragma: no-cache");
 
 // Cegah akses ke halaman ini jika pengguna sudah login
 if (isset($_SESSION["login"]) && $_SESSION["login"] === true) {
-    header("Location: ../dashboard");
+    header("Location: ../home");
     exit;
 }
 

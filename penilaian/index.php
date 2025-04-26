@@ -125,6 +125,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="col">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
+                                    <h3 class="card-title"><a href="proses_fuzzy.php" class="btn btn-sm btn-block bg-gradient-warning" id="proses"><i class="fas fa-gears"></i> PROSES FUZZY</a></h3>
                                     <div class="card-tools mt-2">
                                         <form action="" method="POST">
                                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -304,6 +305,35 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     e.preventDefault();
                     $('#tombol-cari').click();
                 }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#proses').on('click', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: 'proses_fuzzy.php',
+                    method: 'POST',
+                    success: function(response) {
+                        response = JSON.parse(response);
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                title: "Success",
+                                text: response.message,
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = '../hasil_fuzzy';
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                    }
+                });
             });
         });
     </script>

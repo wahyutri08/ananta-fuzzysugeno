@@ -12,32 +12,60 @@ if ($_SESSION['role'] !== 'Admin') {
     exit;
 }
 
-if (isset($_GET["id_rule"]) && is_numeric($_GET["id_rule"])) {
-    $id_rule = $_GET["id_rule"];
+if (isset($_GET["id"]) && is_numeric($_GET["id"])) {
+    $id = $_GET["id"];
 } else {
     header("HTTP/1.1 404 Not Found");
     include("../error/error-404.html");
     exit;
 }
 
-$rule_fuzzy = query("SELECT * FROM rule_fuzzy WHERE id_rule = $id_rule");
-
-if (empty($rule_fuzzy)) {
+$users = query("SELECT * FROM users WHERE id = $id");
+if (empty($users)) {
     header("HTTP/1.1 404 Not Found");
     include("../error/error-404.html");
     exit;
 }
-$rule_fuzzy = $rule_fuzzy[0];
+
+$users = $users[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $result = editRule($_POST);
-    if ($result > 0) {
-        echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
+    // Ambil nilai yang dikirimkan untuk username baru
+    $newUsername = $_POST["username"];
+
+    // Lakukan pemeriksaan dengan database
+    $query = "SELECT username FROM users WHERE username = '$newUsername'";
+    $result = mysqli_query($db, $query);
+
+    // Jika username yang dikirim sudah ada di database selain username saat ini, tampilkan pesan kesalahan
+    if (mysqli_num_rows($result) > 0 && $newUsername !== $users["username"]) {
+        echo json_encode(["status" => "error", "message" => "Username sudah ada. Silakan pilih username lain."]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Rule Already Exists"]);
+        // Lanjutkan dengan pembaruan data jika tidak ada masalah
+        $result = editUsers($_POST);
+        if ($result > 0) {
+
+            // Update session data dengan data baru
+            $_SESSION['user_data']['username'] = $_POST['username'];
+            $_SESSION['user_data']['nama'] = $_POST['nama'];
+            $_SESSION['user_data']['email'] = $_POST['email'];
+            $_SESSION['user_data']['role'] = $_POST['role'];
+            // $_SESSION['user_data']['avatar'] = $_POST['avatar'];
+
+            echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
+        } elseif ($result == -1) {
+            echo json_encode(["status" => "error", "message" => "Non-Image File Format"]);
+        } elseif ($result == -2) {
+            echo json_encode(["status" => "error", "message" => "Image Size Too Large"]);
+        } elseif ($result == -3) {
+            echo json_encode(["status" => "error", "message" => "Confirm Password Incorrect"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Data Failed to Update"]);
+        }
     }
     exit;
 }
+
 
 
 ?>
@@ -48,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit - Rule</title>
+    <title>Edit - <?= $users["nama"]; ?></title>
 
 
 
@@ -80,19 +108,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="page-title mb-3">
                     <div class="row">
                         <div class="col-12 col-md-6 order-md-1 order-last">
-                            <h3>Edit Rule</h3>
+                            <h3>Edit User</h3>
                         </div>
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav
                                 aria-label="breadcrumb"
                                 class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="../home">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="../home">Home</a></li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        Master Data
+                                        Setting
                                     </li>
-                                    <li class="breadcrumb-item" aria-current="page">Rule Rule Fuzzy</li>
-                                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                                    <li class="breadcrumb-item" aria-current="page">User Management</li>
+                                    <li class="breadcrumb-item" aria-current="page">Edit</li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?= $users["nama"]; ?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -105,68 +134,101 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">RULE FUZZY</h4>
+                                    <h4 class="card-title">DATA USER</h4>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
                                         <form method="POST" action="" enctype="multipart/form-data" class="form" data-parsley-validate id="myForm">
-                                            <input type="hidden" name="id_rule" value="<?= $rule_fuzzy["id_rule"]; ?>">
+                                            <input type="hidden" name="id" value="<?= $users["id"]; ?>">
+                                            <input type="hidden" name="avatarLama" value="<?= $users["avatar"]; ?>">
                                             <div class="row">
                                                 <div class="col-md-6 col-12">
-                                                    <fieldset class="form-group mandatory">
-                                                        <label for="nilai_uts" class="form-label">Nilai Ujian Tengeh Semester</label>
-                                                        <select class="form-select" id="nilai_uts" name="nilai_uts" required>
-                                                            <option value="" disabled selected>Choose..</option>
-                                                            <option value="Rendah" <?= ($rule_fuzzy["nilai_uts"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
-                                                            <option value="Sedang" <?= ($rule_fuzzy["nilai_uts"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
-                                                            <option value="Tinggi" <?= ($rule_fuzzy["nilai_uts"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
-                                                        </select>
-                                                    </fieldset>
+                                                    <div class="form-group mandatory">
+                                                        <label for="username" class="form-label">Username</label>
+                                                        <input
+                                                            type="text"
+                                                            id="username"
+                                                            class="form-control"
+                                                            placeholder="Username"
+                                                            name="username"
+                                                            value="<?= $users["username"]; ?>"
+                                                            data-parsley-required="true" />
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6 col-12">
                                                     <fieldset class="form-group mandatory">
-                                                        <label for="nilai_uas" class="form-label">Nilai Ujian Akhir Semester</label>
-                                                        <select class="form-select" id="nilai_uas" name="nilai_uas" required>
+                                                        <label for="status" class="form-label">Status</label>
+                                                        <select class="form-select" id="status" name="status" required>
                                                             <option value="" disabled selected>Choose..</option>
-                                                            <option value="Rendah" <?= ($rule_fuzzy["nilai_uas"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
-                                                            <option value="Sedang" <?= ($rule_fuzzy["nilai_uas"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
-                                                            <option value="Tinggi" <?= ($rule_fuzzy["nilai_uas"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
-                                                        </select>
-                                                    </fieldset>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <fieldset class="form-group mandatory">
-                                                        <label for="nilai_keaktifan" class="form-label">Nilai Keaktifan</label>
-                                                        <select class="form-select" id="nilai_keaktifan" name="nilai_keaktifan" required>
-                                                            <option value="" disabled selected>Choose..</option>
-                                                            <option value="Rendah" <?= ($rule_fuzzy["nilai_keaktifan"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
-                                                            <option value="Sedang" <?= ($rule_fuzzy["nilai_keaktifan"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
-                                                            <option value="Tinggi" <?= ($rule_fuzzy["nilai_keaktifan"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
-                                                        </select>
-                                                    </fieldset>
-                                                </div>
-                                                <div class="col-md-6 col-12">
-                                                    <fieldset class="form-group mandatory">
-                                                        <label for="nilai_penghasilan" class="form-label">Nilai Penghasilan</label>
-                                                        <select class="form-select" id="nilai_penghasilan" name="nilai_penghasilan" required>
-                                                            <option value="" disabled selected>Choose..</option>
-                                                            <option value="Rendah" <?= ($rule_fuzzy["nilai_penghasilan"] == "Rendah") ? "selected" : "" ?>>Rendah</option>
-                                                            <option value="Sedang" <?= ($rule_fuzzy["nilai_penghasilan"] == "Sedang") ? "selected" : "" ?>>Sedang</option>
-                                                            <option value="Tinggi" <?= ($rule_fuzzy["nilai_penghasilan"] == "Tinggi") ? "selected" : "" ?>>Tinggi</option>
+                                                            <option value="Aktif" <?= ($users["status"] == "Aktif") ? "selected" : "" ?>>Aktif</option>
+                                                            <option value="Tidak Aktif" <?= ($users["status"] == "Tidak Aktif") ? "selected" : "" ?>>Tidak Aktif</option>
                                                         </select>
                                                     </fieldset>
                                                 </div>
                                                 <div class="col-md-6 col-12">
                                                     <div class="form-group mandatory">
-                                                        <label for="nilai" class="form-label">Nilai</label>
+                                                        <label for="nama" class="form-label">Nama</label>
                                                         <input
-                                                            type="number"
-                                                            id="nilai"
+                                                            type="text"
+                                                            id="nama"
                                                             class="form-control"
-                                                            name="nilai"
-                                                            placeholder="Nilai"
-                                                            value="<?= $rule_fuzzy["nilai"]; ?>"
+                                                            placeholder="Nama"
+                                                            name="nama"
+                                                            value="<?= $users["nama"]; ?>"
                                                             data-parsley-required="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-12">
+                                                    <div class="form-group mandatory">
+                                                        <label for="password" class="form-label">Password</label>
+                                                        <input
+                                                            type="password"
+                                                            id="password"
+                                                            class="form-control"
+                                                            name="password"
+                                                            placeholder="Password"
+                                                            data-parsley-required="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-12">
+                                                    <div class="form-group mandatory">
+                                                        <label for="email" class="form-label">Email</label>
+                                                        <input
+                                                            type="email"
+                                                            id="email"
+                                                            class="form-control"
+                                                            placeholder="EMail"
+                                                            name="email"
+                                                            value="<?= $users["email"]; ?>"
+                                                            data-parsley-required="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-12">
+                                                    <div class="form-group mandatory">
+                                                        <label for="password2" class="form-label">Konfirmasi Password</label>
+                                                        <input
+                                                            type="password"
+                                                            id="password2"
+                                                            class="form-control"
+                                                            name="password2"
+                                                            placeholder="Konfirmasi Password"
+                                                            data-parsley-required="true" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-12">
+                                                    <fieldset class="form-group mandatory">
+                                                        <label for="role" class="form-label">Role</label>
+                                                        <select class="form-select" id="role" name="role" required>
+                                                            <option value="" disabled selected>Choose..</option>
+                                                            <option value="Admin" <?= ($users["role"] == "Admin") ? "selected" : "" ?>>Admin</option>
+                                                            <option value="Staff" <?= ($users["role"] == "Staff") ? "selected" : "" ?>>Staff</option>
+                                                        </select>
+                                                    </fieldset>
+                                                </div>
+                                                <div class="col-md-6 col-12">
+                                                    <div class="mb-3">
+                                                        <label for="avatar" class="form-label">Photo Profile</label>
+                                                        <input class="form-control" type="file" id="avatar" name="avatar">
                                                     </div>
                                                 </div>
                                             </div>
@@ -208,7 +270,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../assets/extensions/jquery/jquery.min.js"></script>
     <script src="../assets/extensions/parsleyjs/parsley.min.js"></script>
     <script src="../assets/static/js/pages/parsley.js"></script>
-    <script src="../assets/extensions/sweetalert2/sweetalert2.min.js"></script>>
+    <script src="../assets/extensions/sweetalert2/sweetalert2.min.js"></script>
     <script src="../assets/static/js/pages/sweetalert2.js"></script>>
 
     <script>
@@ -230,7 +292,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 text: res.message,
                                 icon: "success"
                             }).then(() => {
-                                window.location.href = '../rule_fuzzy';
+                                window.location.href = '../user_management';
                             });
                         } else {
                             Swal2.fire('Error', res.message, 'error');

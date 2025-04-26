@@ -18,21 +18,23 @@ if (isset($_POST["keyword"])) {
 
 
 // Cek apakah ada pencarian
+// Cek apakah ada pencarian
 if (!empty($keyword)) {
     if ($role == 'Admin') {
         $jumlahData = count(query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%'"));
+            nis LIKE '%$keyword%' OR
+            nama_siswa LIKE '%$keyword%' OR
+            kelas LIKE '%$keyword%' OR
+            email LIKE '%$keyword%' OR
+            no_telfon LIKE '%$keyword%'"));
     } elseif ($role == 'Staff') {
-        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%'"));
+        $jumlahData = count(query("SELECT * FROM siswa WHERE user_id = $user_id AND (
+            nis LIKE '%$keyword%' OR
+            nama_siswa LIKE '%$keyword%' OR
+            kelas LIKE '%$keyword%' OR
+            email LIKE '%$keyword%' OR
+            no_telfon LIKE '%$keyword%'
+        )"));
     }
 } else {
     if ($role == 'Admin') {
@@ -42,6 +44,7 @@ if (!empty($keyword)) {
     }
 }
 
+// Hitung halaman
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
 if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_GET["page"] <= $jumlahHalaman) {
@@ -52,22 +55,24 @@ if (isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0 && $_
 
 $startData = ($halamanAktif - 1) * $jumlahDataPerHalaman;
 
-// Query berdasarkan pencarian dan role
+// Query ambil data
 if (!empty($keyword)) {
     if ($role == 'Admin') {
         $d_siswa = query("SELECT * FROM siswa WHERE 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+            nis LIKE '%$keyword%' OR
+            nama_siswa LIKE '%$keyword%' OR
+            kelas LIKE '%$keyword%' OR
+            email LIKE '%$keyword%' OR
+            no_telfon LIKE '%$keyword%'
+            LIMIT $startData, $jumlahDataPerHalaman");
     } elseif ($role == 'Staff') {
-        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND 
-                    nis LIKE '%$keyword%' OR
-                    nama_siswa LIKE '%$keyword%' OR
-                    kelas LIKE '%$keyword%' OR
-                    email LIKE '%$keyword%' OR
-                    no_telfon LIKE '%$keyword%' LIMIT $startData, $jumlahDataPerHalaman");
+        $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id AND (
+            nis LIKE '%$keyword%' OR
+            nama_siswa LIKE '%$keyword%' OR
+            kelas LIKE '%$keyword%' OR
+            email LIKE '%$keyword%' OR
+            no_telfon LIKE '%$keyword%'
+        ) LIMIT $startData, $jumlahDataPerHalaman");
     }
 } else {
     if ($role == 'Admin') {
@@ -76,6 +81,7 @@ if (!empty($keyword)) {
         $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id LIMIT $startData, $jumlahDataPerHalaman");
     }
 }
+
 ?>
 
 

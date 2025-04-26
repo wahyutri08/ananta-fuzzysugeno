@@ -15,12 +15,9 @@ $role = $_SESSION['role'];
 $variabel = query("SELECT * FROM variabel");
 
 // Ambil data siswa berdasarkan role
-// if ($role == 'Admin') {
-//     $d_siswa = query("SELECT * FROM siswa");
-// } elseif ($role == 'Staff') {
-//     $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id");
-// }
-if ($role == 'Staff') {
+if ($role == 'Admin') {
+    $d_siswa = query("SELECT * FROM siswa");
+} elseif ($role == 'Staff') {
     $d_siswa = query("SELECT * FROM siswa WHERE user_id = $user_id");
 }
 
@@ -67,13 +64,13 @@ foreach ($d_siswa as $siswa) {
 
     // Cek apakah penyimpanan berhasil
     if (!$simpan) {
-        $errors[] = "Failed to Save Results For Students With NIS: $nis";
+        $errors[] = "Gagal menyimpan hasil untuk siswa dengan NIS: $nis";
     }
 }
 
 
 if (empty($errors)) {
-    echo json_encode(["status" => "success", "message" => "All Data Has Been Successfully Processed."]);
+    echo json_encode(["status" => "success", "message" => "Semua data berhasil diproses dan disimpan"]);
 } else {
     echo json_encode(["status" => "error", "message" => implode("; ", $errors)]);
 }

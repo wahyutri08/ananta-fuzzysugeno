@@ -104,23 +104,23 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     </a>
                 </li>
                 <li class="sidebar-title">Setting</li>
-                <li class="sidebar-item has-sub">
-                    <a href="#" class='sidebar-link'>
+                <li class="sidebar-item <?= (in_array($current_page, $settings_page)) ? 'active' : '' ?> has-sub">
+                    <a href="#" class='sidebar-link <?= (in_array($current_page, $settings_page)) ? 'submenu-open' : '' ?>'>
                         <i class="bi bi-person-circle"></i>
                         <span>Account</span>
                     </a>
                     <ul class="submenu">
-                        <li class="submenu-item ">
-                            <a href="account-profile.html" class="submenu-link">Profile</a>
+                        <li class="submenu-item <?= ($current_page == 'profile' ? 'active' : '') ?> ">
+                            <a href="../profile" class="submenu-link">Profile</a>
                         </li>
-                        <li class="submenu-item  ">
-                            <a href="account-security.html" class="submenu-link">Security</a>
+                        <li class="submenu-item <?= ($current_page == 'change_password' ? 'active' : '') ?> ">
+                            <a href="account-security.html" class="submenu-link">Change Password</a>
                         </li>
                     </ul>
                 </li>
                 <?php if ($user['role'] == 'Admin') : ?>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link <?= ($current_page == 'user_management' ? 'active' : '') ?>">
+                    <li class="sidebar-item <?= ($current_page == 'user_management' ? 'active' : '') ?>">
+                        <a href="../user_management" class="sidebar-link">
                             <i class="fa fa-user-cog"></i>
                             <span>User Management</span>
                         </a>

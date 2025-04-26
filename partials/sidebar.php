@@ -3,8 +3,8 @@
 $current_page = basename($_SERVER['REQUEST_URI']);
 
 // Halaman-halaman yang berada di dalam Master Data
-$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy', 'penilaian',];
-$keputusan = ['proses'];
+$master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy'];
+$keputusan = ['proses', 'penilaian'];
 $settings_page = ['profile', 'change_password'];
 $id = $_SESSION["id"];
 $role = $_SESSION["role"];
@@ -76,12 +76,6 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                             echo '';
                         }
                         ?>
-                        <li class="nav-item">
-                            <a href="../penilaian" class="nav-link <?= ($current_page == 'penilaian') ? 'active' : '' ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Penilaian</p>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
@@ -97,53 +91,55 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="../proses" class="nav-link <?= ($current_page == 'proses') ? 'active' : '' ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Proses</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Laporan Hasil Analisa -->
-                <li class="nav-header">LAPORAN</li>
-                <li class="nav-item">
-                    <a href="../hasil_fuzzy" class="nav-link <?= ($current_page == 'hasil_fuzzy') ? 'active' : '' ?>">
-                        <i class="nav-icon fas fa-file-invoice"></i>
-                        <p>Laporan Hasil Analisa</p>
-                    </a>
-                </li>
-
-                <!-- Settings -->
-                <li class="nav-header">SETTINGS</li>
-                <li class="nav-item <?= (in_array($current_page, $settings_page)) ? 'menu-open' : '' ?>">
-                    <a href="#" class="nav-link <?= (in_array($current_page, $settings_page)) ? 'active' : '' ?>">
-                        <i class="nav-icon fas fa-user"></i>
-                        <p>
-                            Account
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="../profile" class="nav-link <?= ($current_page == 'profile') ? 'active' : '' ?>">
+                            <a href="../penilaian" class="nav-link <?= ($current_page == 'penilaian') ? 'active' : '' ?>">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Profile</p>
+                                <p>Penilaian</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="../change_password" class="nav-link <?= ($current_page == 'change_password') ? 'active' : '' ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Change Password</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
+            </ul>
+            </li>
 
-                <!-- User Management -->
-                <?php
-                if ($user['role'] == 'Admin') {
-                    echo '
+            <!-- Laporan Hasil Analisa -->
+            <li class="nav-header">LAPORAN</li>
+            <li class="nav-item">
+                <a href="../hasil_fuzzy" class="nav-link <?= ($current_page == 'hasil_fuzzy') ? 'active' : '' ?>">
+                    <i class="nav-icon fas fa-file-invoice"></i>
+                    <p>Laporan Hasil Analisa</p>
+                </a>
+            </li>
+
+            <!-- Settings -->
+            <li class="nav-header">SETTINGS</li>
+            <li class="nav-item <?= (in_array($current_page, $settings_page)) ? 'menu-open' : '' ?>">
+                <a href="#" class="nav-link <?= (in_array($current_page, $settings_page)) ? 'active' : '' ?>">
+                    <i class="nav-icon fas fa-user"></i>
+                    <p>
+                        Account
+                        <i class="fas fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="../profile" class="nav-link <?= ($current_page == 'profile') ? 'active' : '' ?>">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Profile</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../change_password" class="nav-link <?= ($current_page == 'change_password') ? 'active' : '' ?>">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Change Password</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- User Management -->
+            <?php
+            if ($user['role'] == 'Admin') {
+                echo '
                     <li class="nav-item">
                         <a href="../user_management" class="nav-link ' . ($current_page == 'user_management' ? 'active' : '') . '">
                             <i class="nav-icon fas fa-users"></i>
@@ -151,16 +147,16 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                         </a>
                     </li>
                     ';
-                } else {
-                    echo '';
-                }
-                ?>
-                <li class="nav-item">
-                    <a href="../logout" class="nav-link">
-                        <i class="nav-icon fas fa-power-off"></i>
-                        <p>Logout</p>
-                    </a>
-                </li>
+            } else {
+                echo '';
+            }
+            ?>
+            <li class="nav-item">
+                <a href="../logout" class="nav-link">
+                    <i class="nav-icon fas fa-power-off"></i>
+                    <p>Logout</p>
+                </a>
+            </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
