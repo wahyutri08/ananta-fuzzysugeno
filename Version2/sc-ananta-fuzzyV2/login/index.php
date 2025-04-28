@@ -2,11 +2,14 @@
 session_start();
 require_once '../functions.php';
 
+// Cegah caching
+header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Cegah akses ke halaman ini jika pengguna sudah login
+// Cegah akses ke halaman ini jika sudah login
 if (isset($_SESSION["login"]) && $_SESSION["login"] === true) {
     header("Location: ../home");
     exit;
@@ -18,23 +21,23 @@ if (isset($_POST["login"])) {
     $usernameOremail = $_POST["username"];
     $password = $_POST["password"];
 
-    // Query untuk mencari pengguna berdasarkan username atau email
+    // Query user
     $result = mysqli_query($db, "SELECT * FROM users WHERE username = '$usernameOremail' OR email = '$usernameOremail'");
 
     if (mysqli_num_rows($result) === 1) {
         $row = mysqli_fetch_assoc($result);
 
-        // Cek status pengguna
         if ($row['status'] === 'Aktif') {
-            // Verifikasi password
             if (password_verify($password, $row["password"])) {
-                // Jika login berhasil, set session
+                // Set session
                 $_SESSION["login"] = true;
                 $_SESSION['nama'] = $row['nama'];
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['id'] = $row['id'];
                 $_SESSION['avatar'] = $row['avatar'];
                 $_SESSION['role'] = $row['role'];
+
+                // Setelah login, arahkan ke home
                 header("Location: ../home");
                 exit;
             } else {
@@ -48,6 +51,7 @@ if (isset($_POST["login"])) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -88,7 +92,7 @@ if (isset($_POST["login"])) {
                                 <i class="bi bi-shield-lock"></i>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-4" name="login">Log in</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-4" name="login">Log in</button>
                     </form>
                 </div>
             </div>
@@ -101,5 +105,11 @@ if (isset($_POST["login"])) {
 
     </div>
 </body>
+<script>
+    if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        window.location.href = "../home";
+    }
+</script>
+
 
 </html>

@@ -1,6 +1,6 @@
 <?php
 // Mendapatkan halaman saat ini tanpa ekstensi .php
-$current_page = pathinfo($_SERVER['REQUEST_URI'], PATHINFO_FILENAME);
+$current_page = basename($_SERVER['REQUEST_URI']);
 
 // Halaman-halaman yang berada di dalam Master Data
 $master_data_pages = ['data_siswa', 'data_variabel', 'rule_fuzzy'];
@@ -114,7 +114,7 @@ $user = query("SELECT * FROM users WHERE id = $id")[0];
                             <a href="../profile" class="submenu-link">Profile</a>
                         </li>
                         <li class="submenu-item <?= ($current_page == 'change_password' ? 'active' : '') ?> ">
-                            <a href="account-security.html" class="submenu-link">Change Password</a>
+                            <a href="../change_password" class="submenu-link">Change Password</a>
                         </li>
                     </ul>
                 </li>

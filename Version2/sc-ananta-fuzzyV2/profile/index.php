@@ -12,16 +12,18 @@ $users = query("SELECT * FROM users WHERE id = $id")[0];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = editProfile($_POST);
     if ($result > 0) {
-        echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
+        echo json_encode(["status" => "success", "message" => "Data Berhasil Diubah"]);
     } elseif ($result == -1) {
-        echo json_encode(["status" => "error", "message" => "Non-Image File Format"]);
+        echo json_encode(["status" => "error", "message" => "File Bukan Format Gambar"]);
     } elseif ($result == -2) {
-        echo json_encode(["status" => "error", "message" => "Image Size Too Large"]);
+        echo json_encode(["status" => "error", "message" => "Ukuran Gambar Terlalu Besar"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Data Failed to Update"]);
+        echo json_encode(["status" => "error", "message" => "Data Gagal Diubah"]);
     }
     exit;
 }
+
+
 
 ?>
 <!DOCTYPE html>
@@ -91,17 +93,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-12 col-xl-8">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">Setting</h4>
+                                    <h4 class="card-title">Account Setting</h4>
                                 </div>
                                 <div class="card-body">
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab"
-                                                aria-controls="home" aria-selected="true">Profile</a>
+                                            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
+                                                aria-controls="profile" aria-selected="true">Profile</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content mt-4" id="myTabContent">
-                                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                             <form class="form-horizontal" action="" method="POST" enctype="multipart/form-data" id="myForm">
                                                 <input type="hidden" name="id" value="<?= $users["id"]; ?>">
                                                 <input type="hidden" name="avatarLama" value="<?= $users["avatar"]; ?>">
@@ -139,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                 type="email"
                                                                 id="email"
                                                                 class="form-control"
-                                                                placeholder="EMail"
+                                                                placeholder="Email"
                                                                 name="email"
                                                                 value="<?= $users["email"]; ?>"
                                                                 data-parsley-required="true" />
@@ -152,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row">
+                                                <div class="row mt-4">
                                                     <div class="col-12 d-flex justify-content-end">
                                                         <button type="submit" class="btn btn-primary me-1 mb-1">
                                                             Submit
@@ -182,6 +184,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../assets/static/js/components/dark.js"></script>
     <script src="../assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="../assets/compiled/js/app.js"></script>
+    <script src="../assets/extensions/parsleyjs/parsley.min.js"></script>
+    <script src="../assets/static/js/pages/parsley.js"></script>
     <script src="../assets/extensions/sweetalert2/sweetalert2.min.js"></script>
     <script src="../assets/static/js/pages/sweetalert2.js"></script>>
 

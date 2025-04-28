@@ -6,44 +6,23 @@ if (!isset($_SESSION["login"]) || $_SESSION["login"] !== true) {
     exit;
 }
 
-$user_id = $_SESSION['id'];
-$role = $_SESSION['role'];
-
-if (isset($_GET["id_siswa"]) && is_numeric($_GET["id_siswa"])) {
-    $id_siswa = $_GET["id_siswa"];
-} else {
-    header("HTTP/1.1 404 Not Found");
-    include("../error/error-404.html");
-    exit;
-}
-
-if ($role == 'Admin') {
-    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa");
-} else {
-    $siswa = query("SELECT * FROM siswa WHERE id_siswa = $id_siswa AND user_id = $user_id");
-}
-
-$variabel = query("SELECT * FROM variabel");
-
-if (empty($siswa)) {
-    header("HTTP/1.1 404 Not Found");
-    include("../error/error-404.html");
-    exit;
-}
-$siswa = $siswa[0];
+$id = $_SESSION["id"];
+$user = query("SELECT * FROM users WHERE id = $id")[0];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Pengecekan apakah ada data yang diinput
-    if (empty($_POST)) {
-        echo json_encode(["status" => "error", "message" => "No Data Was Inputted"]);
-        exit;
+    $result = changePassword($_POST);
+    if ($result > 0) {
+        echo json_encode(["status" => "success", "message" => "Password Successfully Changed Please Login Again"]);
+    } elseif ($result == -1) {
+        echo json_encode(["status" => "error", "message" => "Incorrect Confirm password"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Password Failed to Change"]);
     }
-
-    // Memanggil fungsi jika ada data yang diinput
-    dataPostNilai($_POST, $_GET, $role, $user_id);
-    echo json_encode(["status" => "success", "message" => "Data Successfully Updated"]);
     exit;
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit - <?= $siswa["nama_siswa"]; ?></title>
+    <title>Change Password</title>
 
 
 
@@ -84,20 +63,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="page-title mb-3">
                     <div class="row">
                         <div class="col-12 col-md-6 order-md-1 order-last">
-                            <h3>Edit Nilai</h3>
+                            <h3>Change Password</h3>
                         </div>
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav
                                 aria-label="breadcrumb"
                                 class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="../home">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="../home">Home</a></li>
                                     <li class="breadcrumb-item" aria-current="page">
-                                        Master Data
+                                        Setting
                                     </li>
-                                    <li class="breadcrumb-item" aria-current="page">Penilaian</li>
-                                    <li class="breadcrumb-item" aria-current="page">Edit</li>
-                                    <li class="breadcrumb-item active" aria-current="page"><?= $siswa["nama_siswa"]; ?></li>
+                                    <li class="breadcrumb-item" aria-current="page">Change Password</li>
+                                    <li class="breadcrumb-item active" aria-current="page"><?= $user["nama"]; ?></li>
                                 </ol>
                             </nav>
                         </div>
@@ -110,45 +88,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">NILAI SISWA</h4>
+                                    <h4 class="card-title">Change Password</h4>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <form method="POST" action="" enctype="multipart/form-data" class="form" data-parsley-validate id="myForm">
-                                            <input type="hidden" name="id_siswa" value="<?= $siswa["id_siswa"]; ?>">
-                                            <div class="row">
-                                                <?php foreach ($variabel as $v) : ?>
-                                                    <div class="col-md-6 col-12">
-                                                        <div class="form-group mandatory">
-                                                            <label for="<?= $v["id_variabel"]; ?>" class="form-label"><?= $v["nama_variabel"]; ?></label>
-                                                            <?php
-                                                            // Cek role, ambil nilai hanya jika user adalah admin atau terkait sebagai staff
-                                                            if ($role == 'Admin') {
-                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel']);
-                                                            } elseif ($role == 'Staff') {
-                                                                $penilaian = query("SELECT * FROM penilaian WHERE id_siswa = " . $siswa['id_siswa'] . " AND id_variabel = " . $v['id_variabel'] . " AND user_id = " . $user_id);
-                                                            }
-
-                                                            if ($penilaian) {
-                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" data-parsley-required="true" value="' . $penilaian[0]['nilai'] . '">';
-                                                            } else {
-                                                                echo '<input type="number" class="form-control" name="' . $v['id_variabel'] . '" id="' . $v['id_variabel'] . '" placeholder="Nilai" value="">';
-                                                            }
-                                                            ?>
-                                                        </div>
+                                        <form method="POST" action="" enctype="multipart/form-data" id="myForm">
+                                            <input type="hidden" name="id" value="<?= $user["id"]; ?>">
+                                            <div class="form-body">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <label for="password">New Password</label>
                                                     </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12 d-flex justify-content-end">
-                                                    <button type="submit" class="btn btn-primary me-1 mb-1">
-                                                        Submit
-                                                    </button>
-                                                    <button
-                                                        type="reset"
-                                                        class="btn btn-light-secondary me-1 mb-1">
-                                                        Reset
-                                                    </button>
+                                                    <div class="col-md-5 form-group">
+                                                        <input type="password" id="password" class="form-control" name="password"
+                                                            placeholder="New Password">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="password2">Confirm New Password</label>
+                                                    </div>
+                                                    <div class="col-md-5 form-group">
+                                                        <input type="password" id="password2" class="form-control" name="password2"
+                                                            placeholder="Confirm New Password">
+                                                    </div>
+                                                    <div class="col-sm-12 mt-4 d-flex justify-content-end">
+                                                        <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                                                        <button type="reset"
+                                                            class="btn btn-light-secondary me-1 mb-1">Reset</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </form>
@@ -199,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 text: res.message,
                                 icon: "success"
                             }).then(() => {
-                                window.location.href = '../keputusan';
+                                window.location.href = '../logout';
                             });
                         } else {
                             Swal2.fire('Error', res.message, 'error');
