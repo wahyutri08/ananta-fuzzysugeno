@@ -106,8 +106,14 @@ if (isset($_POST["login"])) {
     </div>
 </body>
 <script>
-    if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
-        window.location.href = "../home";
+    // Cegah pengguna kembali ke halaman login dengan tombol back browser
+    window.history.forward();
+
+    function noBack() {
+        window.history.forward();
+    }
+    window.onpageshow = function(evt) {
+        if (evt.persisted) noBack();
     }
 </script>
 

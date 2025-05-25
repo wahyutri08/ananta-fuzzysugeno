@@ -123,6 +123,17 @@ if (isset($_POST["login"])) {
     <script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/dist/js/adminlte.min.js"></script>
+    <script>
+        // Cegah pengguna kembali ke halaman login dengan tombol back browser
+        window.history.forward();
+
+        function noBack() {
+            window.history.forward();
+        }
+        window.onpageshow = function(evt) {
+            if (evt.persisted) noBack();
+        }
+    </script>
 </body>
 
 </html>
